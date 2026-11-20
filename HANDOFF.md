@@ -67,6 +67,9 @@ updated: 2026-11-20 17:48 +0400
 - README's tests badge and remote install commands (`/plugin marketplace add`, `gh skill install`,
   git clone) work only once `CTO-Side-com/tenant-guardian` exists.
 - CI rebuilds the example without diffing it against `docs/example/`.
+- Fixed in TG-5: the first CI run (44748304856) failed before any test ran, because `ubuntu-latest`
+  is now Ubuntu 26.04 and setup-python has no 3.9 build for it. Runner pinned to `ubuntu-24.04`, as
+  SOC 2 did. Still behind SOC 2's workflow: `fail-fast: false`, checkout/setup-python v7.
 
 ## Decisions
 
