@@ -122,8 +122,8 @@ updated: 2026-11-20 17:58 +0400
 | TG-6 | Narrow the output symlink guard (security-critical) | done | 2026-11-20 18:03 | 2026-11-20 18:06 |
 | TG-7 | Recheck: `**` crosses folders | done | 2026-11-20 18:06 | 2026-11-20 18:07 |
 | TG-8 | Widen redaction (security-critical) | done | 2026-11-20 18:07 | 2026-11-20 18:09 |
-| TG-9 | CI: macOS job, fail-fast off, v7 actions | active | 2026-11-20 18:09 | |
-| TG-10 | README, HANDOFF, manifests 1.0.1 | todo | | |
+| TG-9 | CI: macOS job, fail-fast off, v7 actions | done | 2026-11-20 18:09 | 2026-11-20 18:10 |
+| TG-10 | README, HANDOFF, manifests 1.0.1 | active | 2026-11-20 18:10 | |
 | TG-11 | Final review of v1.0.1 (security-critical) | todo | | |
 
 ## Regenerate the README preview
