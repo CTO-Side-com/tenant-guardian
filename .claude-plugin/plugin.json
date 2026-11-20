@@ -1,6 +1,6 @@
 {
   "name": "tenant-guardian",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Evidence-first tenant isolation assessment, synthetic GET probes, reports and remediation tasks.",
   "author": {
     "name": "CTOside"

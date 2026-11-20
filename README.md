@@ -289,7 +289,7 @@ The same run writes `TENANT-ISOLATION.md`, a `risk-register.csv` with one row pe
 | Slack message | [`tasks-slack.txt`](docs/example/tasks-slack.txt) | Paste into a channel, thread or canvas. `@`, `<` and `>` become look-alike characters, so pasted text cannot ping `@channel` or form `<…>` links. |
 | Anywhere | [`tasks.md`](docs/example/tasks.md) | A `- [ ]` checklist for GitHub issues and other Markdown tools. |
 
-CSV cells that start with `=`, `+`, `-` or `@` get a leading apostrophe, so spreadsheets do not run them as formulas. Before anything is written, these are masked by pattern:
+CSV cells that start with `=`, `+`, `-`, `@`, a tab or a carriage return (after any leading spaces) get a leading apostrophe, so spreadsheets do not run them as formulas. Before anything is written, these are masked by pattern:
 
 - email addresses, SSN-format numbers (`NNN-NN-NNNN`) and international (`+…`) or `(NNN) NNN-NNNN` phone numbers;
 - `Bearer` tokens, and any value after a `token`, `password`, `passwd`, `pwd`, `secret`, `api_key`, `api-key`, `access_key` or `private_key` label followed by `:`, `=` or `=>`, including quoted JSON keys (`"password": "…"`) and joined names (`DB_PASSWORD=`, `access_token=`, `client_secret=`);
@@ -307,7 +307,7 @@ After engineering changes, list the changed files (repository-relative, one per 
 python3 "$SKILL_DIR/scripts/guardian.py" recheck --assessment tenant-output/assessment.json --changed-files changed-files.txt --out tenant-output/assessment-recheck.json
 ```
 
-The result is a new assessment. Each affected objective drops to `insufficient_evidence`, keeps its `prior_status` and `stale_evidence` as history, and loses its verified scope. An objective with no `watched_paths` is invalidated conservatively by any change. A watch pattern matches a changed path if it matches from the repository root, where `*` stays within one folder and `**` spans any number of folders (`backend/**` matches `backend/api/app.py`; `**/migrations/*.sql` matches `migrations/001.sql` and `db/migrations/001.sql`). It also matches if it matches the end of the path, as Python's `PurePosixPath.match` does, so `*.sql` matches `db/schema.sql`. A folder name on its own (`backend` or `backend/`) matches only that path, not the files under it: write `backend/**`. Cloud drift, changed memberships, runtime settings and changed data ownership need a separate review.
+The result is a new assessment. Each affected objective drops to `insufficient_evidence`, keeps its `prior_status` and `stale_evidence` as history, and loses its verified scope. An objective with no `watched_paths` is invalidated conservatively by any change. A watch pattern matches a changed path if it matches from the repository root, where `*` stays within one folder and `**` spans any number of folders (`backend/**` matches `backend/api/app.py`; `**/migrations/*.sql` matches `migrations/001.sql` and `db/migrations/001.sql`). It also matches if it matches the end of the path, as Python's `PurePosixPath.match` does, so `*.sql` matches `db/schema.sql`. A pattern can name a folder as well as a file: when any of these rules matches a folder above the changed path, the pattern covers every file under it. So `backend`, `backend/` and `backend/*` all match `backend/api/app.py`, `migrations` matches `apps/billing/migrations/0001.py`, and `.` matches every path. `*.sql` names files, so it covers nothing under `db/` unless a folder's own name ends in `.sql`. Matching errs toward invalidating more, never less. Cloud drift, changed memberships, runtime settings and changed data ownership need a separate review.
 
 ## Safety model
 
@@ -347,7 +347,7 @@ docs/images/                   README infographics and report preview
 ## Development
 
 ```bash
-python3 -m unittest discover -s skills/tenant-guardian/tests -v   # 104 tests, offline plus one loopback probe run
+python3 -m unittest discover -s skills/tenant-guardian/tests -v   # 109 tests, offline plus one loopback probe run
 python3 docs/build_example.py                                     # rebuild docs/example in place (dates and hashes change)
 ```
 

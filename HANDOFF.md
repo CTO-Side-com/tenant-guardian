@@ -1,10 +1,10 @@
 ---
 status: active
-phase: v1.0.2 · Build
-next: TG-14 · docs and manifests 1.0.2
-tests: CI 104/104 on Ubuntu 3.9/3.11/3.13 (2 case-variant tests skipped there) and macOS 3.13 (0 skipped), run 44753789907 green; local macOS 104/104 on 3.13.0 and 3.9.6 (2026-11-20)
+phase: v1.0.2 · Review
+next: TG-15 · final review of v1.0.2
+tests: local macOS 109/109 on 3.13.0 and 3.9.6 (2026-11-21); CI 104/104 on main (run 44753789907)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-21 00:20 +0400
+updated: 2026-11-21 00:23 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -43,11 +43,12 @@ updated: 2026-11-21 00:20 +0400
 - `scripts/probe.py`: two synthetic tenants, own-tenant positive controls first, then
   `leak_observed` / `denied` / `inconclusive`; dry run; `--allow-network`, `--synthetic-only` and an
   exact `--allow-origin` required; HTTPS unless loopback.
-- Tests: 104 in `skills/tenant-guardian/tests` (82 in v1.0.0), including a loopback run of both
-  fixture modes, 12 output-guard tests, 4 recheck pattern tests and 6 redaction tests (secret shapes,
-  ordinary text kept, no secret in any output file including PDF streams, linear time under 1 s).
-  All pass on macOS under the default TMPDIR. `docs/build_example.py` rebuilt the example on a scratch
-  copy with the v1.0.1 code: it differs from the shipped one in dates and port-derived hashes only.
+- Tests: 109 in `skills/tenant-guardian/tests` (82 in v1.0.0), including a loopback run of both
+  fixture modes, 12 output-guard tests, 8 recheck pattern tests, a CSV tab/CR test and 6 redaction
+  tests (secret shapes, ordinary text kept, no secret in any output file including PDF streams,
+  linear time under 1 s). 109/109 on macOS with Python 3.13.0 and 3.9.6 (2026-11-21 00:22).
+  `docs/build_example.py` rebuilt the example on a scratch copy with the v1.0.2 code: dates differ,
+  every CSV is byte-identical.
 - CI (`.github/workflows/tests.yml`): ubuntu-24.04 × Python 3.9/3.11/3.13 plus macos-latest × 3.13,
   `fail-fast: false`, checkout/setup-python v7, unit tests and example build. Green on `main` since
   `6943002`; v1.0.1 run 44753789907 green on all 4 jobs.
@@ -61,17 +62,13 @@ updated: 2026-11-21 00:20 +0400
   it). Verified by TG-11: names where the label is not last (`SECRET_KEY=`, `PASSWORD_HASH=`), a URL
   password containing `/` (or partly `@`) and other providers' keys pass through; `pwd: /path`,
   `Token: x`, `git@github.com:…` and `logo@2x.png` are over-masked. Same as SOC 2; README says so.
-- **A folder name as a watched path matches nothing below it.** `backend` or `backend/` invalidates
-  only on that exact path, so the recheck fails open for `backend/app.py`; `backend/**` works.
-  Present since v1.0.0; README now says so. Widening `watched()` to treat a bare folder as a prefix
-  would fix it: a behaviour change to agree first. A watched path of `.` or `./` passes `validate`,
-  then `recheck` exits 1 with "empty pattern" (no traceback; also since v1.0.0).
+- **Folder patterns widen by suffix too (v1.0.2, by design).** `migrations` covers
+  `apps/x/migrations/0001.py`, and `api` covers `services/api/handlers.py`, because the end-anchored
+  rule that already let `api` match a file `services/api` now also accepts that folder. More
+  invalidation, never less; README says so.
 - **Output guard covers the repository only from its root.** From a subfolder, a link planted
   elsewhere in the repository is outside the working directory and is followed. README tells users
   to run from the root.
-- **CSV cells starting with a bare tab or CR are not prefixed.** `cell()` prefixes `=`, `+`, `-`, `@`
-  (after leading whitespace), but not a leading tab or CR on its own, which SOC 2's `csv_safe`
-  also neutralizes. Out of v1.0.1's scope; a candidate for the next patch.
 - **Scanner skip list is exact-name only.** `SKIP` in `scripts/guardian.py:132` is case-sensitive
   folder names, so `fixture/`, `vendor/` or a dump in `db/` is read (TG-3 confirmed; file and line
   only are recorded). `.rs`, `.kt`, `.mjs` and `.vue` are not scanned. README lists the exact names.
@@ -112,6 +109,15 @@ updated: 2026-11-21 00:20 +0400
       source assessment" check (`resolve()` does not fold case) and overwrote
       `out/assessment-redacted.json`. Now compared with `os.path.samefile`. Red: the CLI exited 0.
       The test skips on case-sensitive filesystems; the macOS CI job runs it.
+- Fixed in v1.0.2, each with tests watched red first:
+  - TG-12 (`1968ccc`, since v1.0.0): a folder name in `watched_paths` (`backend`, `backend/`,
+    `services/*`) matched only that path, so a recheck failed open on `backend/app.py`; `.` and `./`
+    exited 1 with "empty pattern". Every rule now also accepts a match on a folder above the changed
+    path, and `.` names the root. Red: 7 failures and 2 `ValueError: empty pattern` errors.
+    `test_recheck_folder_name_ignores_lookalike_paths` passes before and after (a guard, not red).
+  - TG-13 (`e8431f8`, since v1.0.0): `cell()` did not prefix a cell starting with a tab or CR
+    (CR was flattened to a space first). Now checked before flattening, as SOC 2's `csv_safe` does.
+    Red: 4 failures. The shipped example CSVs are unchanged by it.
 
 ## Decisions
 
@@ -136,6 +142,11 @@ updated: 2026-11-21 00:20 +0400
       `fail-fast: false` and v7 actions; README, HANDOFF and manifests at 1.0.1. In-session on branch
       `v1.0.1`, one commit per change, final review by general-purpose (strongest model, high effort:
       redaction and the output guard are security-critical), then merge to `main` and push.
+- [x] 2026-11-21 · Build v1.0.2 (answered 00:19 "folder name shall be adaptive .csv yes, make the
+      changes and push"). "Adaptive" read as: a pattern names a file or a folder, and a folder covers
+      every file under it, with `.` as the root. In-session on branch `v1.0.2`, final review by the
+      `reviewer` agent (standard risk), then merge to `main` and push. Manifests at 1.0.2;
+      `references/checks.json` stays at 1.0.0 for the same reason as in v1.0.1.
 
 ## Needs you
 
@@ -176,8 +187,8 @@ updated: 2026-11-21 00:20 +0400
 | TG-11 | Final review of v1.0.1 (security-critical) | done | 2026-11-20 18:12 | 2026-11-20 18:28 |
 | TG-12 | Recheck: a pattern naming a folder covers the files under it | done | 2026-11-21 00:20 | 2026-11-21 00:21 |
 | TG-13 | CSV: prefix cells starting with a tab or CR | done | 2026-11-21 00:21 | 2026-11-21 00:22 |
-| TG-14 | README, HANDOFF, manifests 1.0.2 | active | 2026-11-21 00:22 | |
-| TG-15 | Final review of v1.0.2 | todo | | |
+| TG-14 | README, HANDOFF, manifests 1.0.2 | done | 2026-11-21 00:22 | 2026-11-21 00:23 |
+| TG-15 | Final review of v1.0.2 | active | 2026-11-21 00:23 | |
 
 ## Regenerate the README preview
 
@@ -227,9 +238,17 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. Wait for the Needs-you answers on the v1.0.2 candidates and the release tag.
-2. Optional: find out why the loopback probe test takes 36 s on the macOS runner.
+1. Read the TG-15 review report (path under In flight). Fix each finding on `v1.0.2` with a test
+   watched red first; re-run the gate (unit tests on 3.13 and 3.9).
+2. Fast-forward `main` to `v1.0.2`, list the files, push (authorized 2026-11-21 00:19), watch CI.
+3. Record the push, CI run and last commit here; tick TG-15.
+4. Still open in Needs you: the GitHub release tag. Optional: why the loopback probe test takes 36 s
+   on the macOS runner.
 
 ## In flight
 
-- Nothing. v1.0.1 is merged and pushed; local branch `v1.0.1` is fully merged into `main`.
+- TG-15 review: `reviewer` agent, whole branch `main..v1.0.2` (TG-12 `1968ccc`, TG-13 `e8431f8`, TG-14
+  docs commit). Plants (at most 3, one batch) in a throwaway detached worktree under the session
+  scratchpad `/private/tmp/claude-501/-Users-rezasahebozamani-Projects-Skills-tenant-guardian/3f109410-cac2-49a7-8dc1-c461a5b7b403/scratchpad/tg15-wt`;
+  report to `.../scratchpad/tg15-review.md`. If the session restarted, the agent is dead: re-dispatch.
+- Local branch `v1.0.1` is fully merged into `main` (kept).
