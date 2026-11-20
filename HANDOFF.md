@@ -120,8 +120,8 @@ updated: 2026-11-20 17:58 +0400
 | TG-4 | Rename marketplace to `ctoside-tenant` | done | 2026-11-20 17:51 | 2026-11-20 17:55 |
 | TG-5 | Publish: git init, commits, public repo, push, CI | done | 2026-11-20 17:51 | 2026-11-20 17:58 |
 | TG-6 | Narrow the output symlink guard (security-critical) | done | 2026-11-20 18:03 | 2026-11-20 18:06 |
-| TG-7 | Recheck: `**` crosses folders | active | 2026-11-20 18:06 | |
-| TG-8 | Widen redaction (security-critical) | todo | | |
+| TG-7 | Recheck: `**` crosses folders | done | 2026-11-20 18:06 | 2026-11-20 18:07 |
+| TG-8 | Widen redaction (security-critical) | active | 2026-11-20 18:07 | |
 | TG-9 | CI: macOS job, fail-fast off, v7 actions | todo | | |
 | TG-10 | README, HANDOFF, manifests 1.0.1 | todo | | |
 | TG-11 | Final review of v1.0.1 (security-critical) | todo | | |

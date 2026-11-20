@@ -2,6 +2,7 @@
 import argparse
 import copy
 import csv
+import fnmatch
 import hashlib
 import json
 import os
@@ -259,6 +260,16 @@ def tasks(a,out):
     output(Path(out)/'tasks-slack.txt').write_text(text.replace('@','＠').replace('<','‹').replace('>','›'),encoding='utf-8')
     return len(rows)
 
+def watched(path,pattern):
+    # PurePosixPath.match is anchored at the end and its ** never crosses a folder. Keep its matches
+    # (more invalidation stays conservative) and add a match from the root in which ** spans folders.
+    parts=PurePosixPath(path).parts;reach=[True]+[False]*len(parts)
+    for w in PurePosixPath(pattern).parts:
+        if w=='**':
+            for i in range(1,len(parts)+1):reach[i]=reach[i] or reach[i-1]
+        else:reach=[False]+[reach[i] and fnmatch.fnmatchcase(parts[i],w) for i in range(len(parts))]
+    return path==pattern or PurePosixPath(path).match(pattern) or reach[-1]
+
 def recheck(a,paths):
     require_valid(a);new=copy.deepcopy(a);changed=[]
     for p in paths:
@@ -266,7 +277,7 @@ def recheck(a,paths):
         if q.is_absolute() or '..' in q.parts:raise ValueError('Use repository-relative changed paths')
     for c in new['checks']:
         watch=c['watched_paths']
-        if paths and (not watch or any(PurePosixPath(p).match(w) or p==w for p in paths for w in watch)):
+        if paths and (not watch or any(watched(p,w) for p in paths for w in watch)):
             c['prior_status']=c['status'];c['status']='insufficient_evidence';c['stale_evidence']=c['evidence_refs'];c['evidence_refs']=[];c['verified_scope']='';c['rationale']='Recheck required after relevant changes.';changed.append(c['id'])
     new['recheck']={'performed_on':today(),'changed_files':paths,'invalidated':changed,'notice':'Changes outside Git, operational drift and stale scope assumptions require separate review.'}
     return new

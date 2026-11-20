@@ -113,6 +113,17 @@ class AssessmentTests(unittest.TestCase):
         self.verified();new=recheck(self.a,['app/api.py']);self.assertEqual('verified_in_scope',self.a['checks'][0]['status']);self.assertEqual('insufficient_evidence',new['checks'][0]['status']);self.assertEqual(['EV-TEST'],new['checks'][0]['stale_evidence']);self.assertEqual('',new['checks'][0]['verified_scope'])
     def test_recheck_watch(self):
         c=self.verified();c['watched_paths']=['backend/*'];self.assertEqual('verified_in_scope',recheck(self.a,['frontend/a.ts'])['checks'][0]['status'])
+    def test_recheck_double_star_crosses_folders(self):
+        c=self.verified();c['watched_paths']=['backend/**'];new=recheck(self.a,['backend/api/views.py'])
+        self.assertEqual('insufficient_evidence',new['checks'][0]['status']);self.assertIn(c['id'],new['recheck']['invalidated'])
+    def test_recheck_leading_double_star_matches_any_depth(self):
+        c=self.verified();c['watched_paths']=['**/migrations/*.sql']
+        for p in ('migrations/001.sql','db/migrations/001.sql','a/b/migrations/001.sql'):
+            with self.subTest(path=p):self.assertEqual('insufficient_evidence',recheck(self.a,[p])['checks'][0]['status'])
+    def test_recheck_double_star_ignores_unrelated_paths(self):
+        c=self.verified();c['watched_paths']=['backend/**'];self.assertEqual('verified_in_scope',recheck(self.a,['frontend/a.ts','backend.py'])['checks'][0]['status'])
+    def test_recheck_keeps_suffix_matches(self):
+        c=self.verified();c['watched_paths']=['*.sql'];self.assertEqual('insufficient_evidence',recheck(self.a,['db/schema.sql'])['checks'][0]['status'])
     def test_recheck_no_changes(self):self.assertEqual([],recheck(self.a,[])['recheck']['invalidated'])
     def test_recheck_traversal(self):
         with self.assertRaises(ValueError):recheck(self.a,['../secret'])
