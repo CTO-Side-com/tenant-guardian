@@ -218,6 +218,13 @@ class OutputGuardTests(unittest.TestCase):
         try:write('out/link/../x.json',{})
         except ValueError:self.fail("'..' was not collapsed before the symlink check")
         self.assertTrue(os.path.isfile('out/x.json'));self.assertFalse(os.path.exists('x.json'));self.assertFalse(os.path.exists('elsewhere/x.json'))
+    def test_alias_outside_cwd_to_planted_symlink_is_refused(self):
+        # home/alias lies outside the working directory but resolves into it, onto the planted out/link.
+        tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup);old=os.getcwd();self.addCleanup(os.chdir,old)
+        for d in ('repo/out/real/sub','home'):os.makedirs(os.path.join(tmp.name,d))
+        os.symlink('real',os.path.join(tmp.name,'repo','out','link'));os.symlink(os.path.join('..','repo','out'),os.path.join(tmp.name,'home','alias'));os.chdir(os.path.join(tmp.name,'repo'))
+        with self.assertRaises(ValueError):write(os.path.join(tmp.name,'home','alias','link','sub','report.json'),{})
+        self.assertEqual([],os.listdir('out/real/sub'))
     def linked_out(self):
         tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup);old=os.getcwd();os.chdir(tmp.name);self.addCleanup(os.chdir,old)
         os.makedirs('out');os.makedirs('elsewhere');os.symlink('../elsewhere','out/link')
