@@ -4,7 +4,7 @@ phase: v1.0.2 · Review
 next: TG-15 · final review of v1.0.2
 tests: local macOS 109/109 on 3.13.0 and 3.9.6 (2026-11-21); CI 104/104 on main (run 44753789907)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-21 00:23 +0400
+updated: 2026-11-21 00:31 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -62,6 +62,10 @@ updated: 2026-11-21 00:23 +0400
   it). Verified by TG-11: names where the label is not last (`SECRET_KEY=`, `PASSWORD_HASH=`), a URL
   password containing `/` (or partly `@`) and other providers' keys pass through; `pwd: /path`,
   `Token: x`, `git@github.com:…` and `logo@2x.png` are over-masked. Same as SOC 2; README says so.
+- **A watched path starting with `/` matches nothing (since v1.0.0).** `validate` accepts `/backend`,
+  `//backend` and `/**`, but changed paths are always relative, so `watched()` never matches them and
+  the recheck fails open for anyone writing the root anchor as `.gitignore` and CODEOWNERS do (TG-15
+  finding 4). README now says so. Fix waits on Needs you: treat a leading `/` as rooted, or reject it.
 - **Folder patterns widen by suffix too (v1.0.2, by design).** `migrations` covers
   `apps/x/migrations/0001.py`, and `api` covers `services/api/handlers.py`, because the end-anchored
   rule that already let `api` match a file `services/api` now also accepts that folder. More
@@ -118,6 +122,15 @@ updated: 2026-11-21 00:23 +0400
   - TG-13 (`e8431f8`, since v1.0.0): `cell()` did not prefix a cell starting with a tab or CR
     (CR was flattened to a space first). Now checked before flattening, as SOC 2's `csv_safe` does.
     Red: 4 failures. The shipped example CSVs are unchanged by it.
+  - TG-15 review (verdict ship; gate 109/109 on 3.13.0 and 3.9.6; plants 2 of 3 caught): over
+    661,752 pattern/path pairs, 0 matches lost against `main` and 0 new exceptions (bound 0 each);
+    `cell()` agrees with SOC 2's `csv_safe` on every generated input. P1 (string-prefix folder
+    compare) failed the lookalike guard test on its own assertion. Findings, all minor:
+    - 1: P3 (prefix any cell with leading whitespace) passed all 109. The CSV test now also
+      requires `' team a'` and `'  note'` to stay unprefixed; the reviewer re-runs P3 against it.
+    - 2, 3: README's CSV sentence (a `\n` before a tab skips the prefix, as in SOC 2) and its
+      contradictory `*.sql` sentence reworded.
+    - 4: absolute watched paths, filed under Known problems and Needs you.
 
 ## Decisions
 
@@ -151,6 +164,10 @@ updated: 2026-11-21 00:23 +0400
 ## Needs you
 
 - [ ] 2026-11-20 · Tag and publish a GitHub release `v1.0.1`? (recommend yes; not done unasked)
+- [ ] 2026-11-21 · Treat a watched path starting with `/` (`/backend`, `/**`) as anchored at the
+      repository root, as `.gitignore` and CODEOWNERS do, instead of matching nothing? It only adds
+      invalidations. The alternative is to reject it in `validate`, which breaks assessments that
+      have one. (recommend rooted)
 
 - [x] 2026-11-20 · v1.0.2: make a bare folder in `watched_paths` (`backend`, `backend/`) match the files
       under it, so a recheck no longer fails open there? It only adds invalidations. (recommend yes;
@@ -238,17 +255,19 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. Read the TG-15 review report (path under In flight). Fix each finding on `v1.0.2` with a test
-   watched red first; re-run the gate (unit tests on 3.13 and 3.9).
-2. Fast-forward `main` to `v1.0.2`, list the files, push (authorized 2026-11-21 00:19), watch CI.
+1. Read the reviewer's P3 re-check (path under In flight). It must fail the CSV test on its own
+   assertion; if not, strengthen the test and ask again.
+2. Re-run the gate (unit tests on 3.13 and 3.9), fast-forward `main` to `v1.0.2`, list the files,
+   push (authorized 2026-11-21 00:19), watch CI.
 3. Record the push, CI run and last commit here; tick TG-15.
-4. Still open in Needs you: the GitHub release tag. Optional: why the loopback probe test takes 36 s
-   on the macOS runner.
+4. Still open in Needs you: the GitHub release tag and rooted `/` watched paths. Optional: why the
+   loopback probe test takes 36 s on the macOS runner.
 
 ## In flight
 
-- TG-15 review: `reviewer` agent, whole branch `main..v1.0.2` (TG-12 `1968ccc`, TG-13 `e8431f8`, TG-14
-  docs commit). Plants (at most 3, one batch) in a throwaway detached worktree under the session
-  scratchpad `/private/tmp/claude-501/-Users-rezasahebozamani-Projects-Skills-tenant-guardian/3f109410-cac2-49a7-8dc1-c461a5b7b403/scratchpad/tg15-wt`;
-  report to `.../scratchpad/tg15-review.md`. If the session restarted, the agent is dead: re-dispatch.
+- TG-15 review done (report `/private/tmp/claude-501/-Users-rezasahebozamani-Projects-Skills-tenant-guardian/3f109410-cac2-49a7-8dc1-c461a5b7b403/scratchpad/tg15-review.md`,
+  verdict ship). TG-15 re-check: the same `reviewer` agent re-runs plant P3 against the extended CSV
+  test on `v1.0.2` HEAD, in a fresh throwaway worktree `.../scratchpad/tg15-wt`; result appended
+  to `tg15-review.md` under "Re-check". If the session restarted, the agent is dead: re-dispatch
+  a `reviewer` with P3 from `.../scratchpad/tg15/plants.py`.
 - Local branch `v1.0.1` is fully merged into `main` (kept).
