@@ -200,7 +200,8 @@ def plan(a,path):
     with output(path).open('x',encoding='utf-8') as f:f.write('\n'.join(clean(x) for x in lines))
 
 def report(a,out,pdf=False):
-    require_valid(a);defs={c['id']:c for c in catalog()['checks']}
+    # output() collapses '..' before the OS follows links; the manifest must read the same files.
+    out=os.path.abspath(out);require_valid(a);defs={c['id']:c for c in catalog()['checks']}
     lines=['# Tenant Guardian',NOTICE,'','Product: '+a['product'],'Environment: '+a['environment'],
         'Assessor: '+(a['assessor'] or 'Unassigned'),'Architecture: '+a['isolation_architecture'],
         'Systems: '+(', '.join(a['systems']) or 'Unknown'),'Exclusions: '+(', '.join(a['exclusions']) or 'None recorded'),
@@ -252,7 +253,7 @@ def render_pdf(lines,path):
     output(path).write_bytes(doc.output())
 
 def tasks(a,out):
-    require_valid(a);defs={c['id']:c for c in catalog()['checks']};rows=[]
+    out=os.path.abspath(out);require_valid(a);defs={c['id']:c for c in catalog()['checks']};rows=[]
     for c in a['checks']:
         if c['status'] in ('verified_in_scope','not_applicable'):continue
         prefix={'confirmed_gap':'Fix: ','suspected_gap':'Investigate: ','insufficient_evidence':'Collect evidence: '}[c['status']]
@@ -305,14 +306,15 @@ def main():
             data=load(a.assessment)
             if a.command in ('report','tasks'):
                 names=['TENANT-ISOLATION.md','assessment-redacted.json','risk-register.csv','TENANT-ISOLATION.pdf','handoff-manifest.json'] if a.command=='report' else ['tasks-jira.csv','tasks-notion.csv','tasks-slack-list.csv','tasks.md','tasks-slack.txt']
-                if any((Path(a.out)/n).resolve()==Path(a.assessment).resolve() for n in names):
+                # Resolve outputs as output() writes them: '..' collapsed first, then links followed.
+                if any(Path(os.path.abspath(Path(a.out)/n)).resolve()==Path(a.assessment).resolve() for n in names):
                     raise ValueError('Output would replace the source assessment; choose another directory')
             if a.command=='validate':require_valid(data);print('Valid structure. Evidence truth and scope sufficiency require review.')
             elif a.command=='plan':plan(data,a.out)
             elif a.command=='report':report(data,a.out,a.pdf)
             elif a.command=='tasks':print('Exported',tasks(data,a.out),'tasks')
             elif a.command=='recheck':
-                if Path(a.out).resolve()==Path(a.assessment).resolve():raise ValueError('Preserve the baseline; choose a new output path')
+                if Path(os.path.abspath(a.out)).resolve()==Path(a.assessment).resolve():raise ValueError('Preserve the baseline; choose a new output path')
                 paths=[s.strip() for s in Path(a.changed_files).read_text().splitlines() if s.strip()]
                 write(a.out,recheck(data,paths))
     except (ValueError,OSError,TypeError,KeyError) as e:p.exit(1,'Tenant Guardian: '+str(e)+'\n')

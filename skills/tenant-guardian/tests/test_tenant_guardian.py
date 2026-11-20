@@ -218,6 +218,19 @@ class OutputGuardTests(unittest.TestCase):
         try:write('out/link/../x.json',{})
         except ValueError:self.fail("'..' was not collapsed before the symlink check")
         self.assertTrue(os.path.isfile('out/x.json'));self.assertFalse(os.path.exists('x.json'));self.assertFalse(os.path.exists('elsewhere/x.json'))
+    def linked_out(self):
+        tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup);old=os.getcwd();os.chdir(tmp.name);self.addCleanup(os.chdir,old)
+        os.makedirs('out');os.makedirs('elsewhere');os.symlink('../elsewhere','out/link')
+    def test_report_manifest_hashes_the_files_beside_it(self):
+        self.linked_out()
+        for n in ('TENANT-ISOLATION.md','assessment-redacted.json','risk-register.csv'):Path(n).write_text('decoy')
+        report(initialize('Synthetic SaaS','staging'),'out/link/..')
+        for f in json.loads(Path('out/handoff-manifest.json').read_text())['files']:
+            self.assertEqual(hashlib.sha256(Path('out',f['path']).read_bytes()).hexdigest(),f['sha256'],f['path'])
+    def test_cli_report_through_dotdot_preserves_source_assessment(self):
+        self.linked_out();a=initialize('person@example.com','staging');p=Path('out/assessment-redacted.json');write(p,a);before=p.read_bytes()
+        r=subprocess.run([sys.executable,str(ROOT/'scripts/guardian.py'),'report','--assessment',str(p),'--out','out/link/..'],capture_output=True,text=True)
+        self.assertNotEqual(0,r.returncode);self.assertEqual(before,p.read_bytes());self.assertNotIn('Traceback',r.stderr)
 
 class RedactionTests(unittest.TestCase):
     def test_clean_redacts_secret_shapes(self):
