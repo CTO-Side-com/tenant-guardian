@@ -238,6 +238,12 @@ class OutputGuardTests(unittest.TestCase):
         self.linked_out();a=initialize('person@example.com','staging');p=Path('out/assessment-redacted.json');write(p,a);before=p.read_bytes()
         r=subprocess.run([sys.executable,str(ROOT/'scripts/guardian.py'),'report','--assessment',str(p),'--out','out/link/..'],capture_output=True,text=True)
         self.assertNotEqual(0,r.returncode);self.assertEqual(before,p.read_bytes());self.assertNotIn('Traceback',r.stderr)
+    def test_cli_report_case_variant_preserves_source_assessment(self):
+        self.linked_out()
+        if not os.path.isdir('OUT'):self.skipTest('case-sensitive filesystem: OUT is not an alias of out')
+        a=initialize('person@example.com','staging');p=Path('out/assessment-redacted.json');write(p,a);before=p.read_bytes()
+        r=subprocess.run([sys.executable,str(ROOT/'scripts/guardian.py'),'report','--assessment',str(p),'--out','OUT'],capture_output=True,text=True)
+        self.assertNotEqual(0,r.returncode);self.assertEqual(before,p.read_bytes());self.assertNotIn('Traceback',r.stderr)
 
 class RedactionTests(unittest.TestCase):
     def test_clean_redacts_secret_shapes(self):

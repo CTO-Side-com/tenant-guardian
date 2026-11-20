@@ -289,6 +289,8 @@ def recheck(a,paths):
     new['recheck']={'performed_on':today(),'changed_files':paths,'invalidated':changed,'notice':'Changes outside Git, operational drift and stale scope assumptions require separate review.'}
     return new
 
+def same(a,b):return os.path.exists(a) and os.path.exists(b) and os.path.samefile(a,b)
+
 def main():
     p=argparse.ArgumentParser(description=__doc__);subs=p.add_subparsers(dest='command',required=True)
     q=subs.add_parser('init');q.add_argument('--product',required=True);q.add_argument('--environment',required=True);q.add_argument('--out',required=True)
@@ -306,15 +308,16 @@ def main():
             data=load(a.assessment)
             if a.command in ('report','tasks'):
                 names=['TENANT-ISOLATION.md','assessment-redacted.json','risk-register.csv','TENANT-ISOLATION.pdf','handoff-manifest.json'] if a.command=='report' else ['tasks-jira.csv','tasks-notion.csv','tasks-slack-list.csv','tasks.md','tasks-slack.txt']
-                # Resolve outputs as output() writes them: '..' collapsed first, then links followed.
-                if any(Path(os.path.abspath(Path(a.out)/n)).resolve()==Path(a.assessment).resolve() for n in names):
+                # Paths as output() writes them ('..' collapsed first), compared by file identity, since
+                # resolve() follows links but does not fold case on case-insensitive filesystems.
+                if any(same(os.path.abspath(Path(a.out)/n),a.assessment) for n in names):
                     raise ValueError('Output would replace the source assessment; choose another directory')
             if a.command=='validate':require_valid(data);print('Valid structure. Evidence truth and scope sufficiency require review.')
             elif a.command=='plan':plan(data,a.out)
             elif a.command=='report':report(data,a.out,a.pdf)
             elif a.command=='tasks':print('Exported',tasks(data,a.out),'tasks')
             elif a.command=='recheck':
-                if Path(os.path.abspath(a.out)).resolve()==Path(a.assessment).resolve():raise ValueError('Preserve the baseline; choose a new output path')
+                if same(os.path.abspath(a.out),a.assessment):raise ValueError('Preserve the baseline; choose a new output path')
                 paths=[s.strip() for s in Path(a.changed_files).read_text().splitlines() if s.strip()]
                 write(a.out,recheck(data,paths))
     except (ValueError,OSError,TypeError,KeyError) as e:p.exit(1,'Tenant Guardian: '+str(e)+'\n')
