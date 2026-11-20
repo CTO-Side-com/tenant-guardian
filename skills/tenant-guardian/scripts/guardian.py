@@ -35,10 +35,16 @@ def output(path):
 def write(path,data,overwrite=False):
     with output(path).open('w' if overwrite else 'x',encoding='utf-8') as f:json.dump(data,f,indent=2,ensure_ascii=True);f.write('\n')
 def clean(s):
+    # Patterns follow SOC 2 Engineering Guardian v1.1. Every repeat is bounded or anchored so that
+    # adversarial text stays linear; the email local part is capped at 64 for that reason.
     s=str(s).encode('utf-8','replace').decode('utf-8')
-    s=re.sub(r'\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b','[REDACTED_EMAIL]',s)
+    s=re.sub(r'(?s)-----BEGIN [A-Z ]*PRIVATE KEY(?: BLOCK)?-----(?:.*?-----END [A-Z ]*PRIVATE KEY(?: BLOCK)?-----|.*)','[REDACTED_SECRET]',s)
+    s=re.sub(r'(?i)\b([a-z][a-z0-9+.-]{0,31}://)[^/\s:@]*:[^/\s@]+@',r'\1[REDACTED_SECRET]@',s)
+    s=re.sub(r'\b[\w.+-]{1,64}@[\w.-]+\.[A-Za-z]{2,}\b','[REDACTED_EMAIL]',s)
     s=re.sub(r'\b\d{3}-\d{2}-\d{4}\b','[REDACTED_ID]',s)
-    s=re.sub(r'(?i)\b(?:bearer\s+|(?:password|secret|token|api_key)\s*[:=]\s*)[^\s,;]+','[REDACTED_SECRET]',s)
+    s=re.sub(r'(?<![\w+])\+\d(?:[ .()-]{0,2}(?!\d{4}-\d{2}-\d{2})\d){6,14}\b|\(\d{3}\) ?\d{3}-\d{4}\b','[REDACTED_PHONE]',s)
+    s=re.sub(r'''(?i)\bbearer\s+\S+|(?<![A-Za-z0-9])(?:token|passw(?:or)?d|pwd|secret|api[_-]?key|access_?key|private_?key)["']?\s*(?:=>|[:=])\s*(?:"[^"\n]*"?|'[^'\n]*'?|\S+)''','[REDACTED_SECRET]',s)
+    s=re.sub(r'\b(?:gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+|sk-[A-Za-z0-9_-]{16,}|[sr]k_(?:live|test)_[A-Za-z0-9_]{16,}|AKIA[0-9A-Z]{16}|(?:xox[abeprs]|xapp)-[A-Za-z0-9-]+|(?<!-)eyJ[\w-]+\.eyJ[\w-]+\.[\w-]+)\b','[REDACTED_SECRET]',s)
     return s[:20000]
 def cell(s):
     s=clean(s).replace('\n',' ').replace('\r',' ')

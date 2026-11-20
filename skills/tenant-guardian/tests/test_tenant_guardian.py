@@ -5,17 +5,43 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
 from threading import Thread
+import time
 import unittest
 from unittest.mock import patch
+import zlib
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
-from guardian import initialize,validate,report,tasks,recheck,scan,write,plan,cell,catalog
+from guardian import initialize,validate,report,tasks,recheck,scan,write,plan,cell,catalog,clean
 from probe import validate_plan,run,origin,MAX_BODY,fetch
+
+# Synthetic values, split so secret scanners do not flag this file.
+PASSWORD='Hunter2'+'Synthetic';STRIPE='sk_'+'live_SYNTHETIC0000000000';TOKEN='SYNTH'+'tok123456';REDIS_PW='SYNTH'+'redispw'
+SECRET_SHAPES=[  # (text, value that must not survive)
+    ('key '+STRIPE+' leaked',STRIPE),('key '+'sk_'+'test_SYNTHETIC0000000000','sk_'+'test_SYNTHETIC0000000000'),
+    ('restricted '+'rk_'+'live_SYNTHETIC0000000000','rk_'+'live_SYNTHETIC0000000000'),('openai '+'sk-'+'SYNTHETIC0000000000abcd','SYNTHETIC0000000000abcd'),
+    ('Rotate access_token='+TOKEN,TOKEN),('client_secret='+'SYNTHsecret123','SYNTHsecret123'),
+    ('commits DB_PASSWORD='+PASSWORD+' to git',PASSWORD),('{"password": "'+PASSWORD+'"}',PASSWORD),
+    ("{'password': '"+'Synth Spaced Pw'+"'}",'Spaced Pw'),('passwd='+'SynthPasswd1','SynthPasswd1'),('pwd: '+'SynthPwd1','SynthPwd1'),
+    ('api-key='+'SYNTHapikey02','SYNTHapikey02'),('header X-API-Key: '+'SYNTHapikey01','SYNTHapikey01'),('password => '+'SynthArrowPw1','SynthArrowPw1'),
+    ('aws '+'AKIA'+'SYNTHETIC0000000','AKIA'+'SYNTHETIC0000000'),('gh '+'ghp_'+'SYNTHETIC0000000000000000000000000000','SYNTHETIC0000000000000000000000000000'),
+    ('slack '+'xox'+'b-0000-SYNTHETIC-token','xox'+'b-0000-SYNTHETIC-token'),('slack '+'xapp'+'-1-A0SYNTH-0000-SYNTHETICappTOKEN','SYNTHETICappTOKEN'),
+    ('jwt '+'eyJ'+'hbGciOiJIUzI1NiJ9.'+'eyJ'+'zdWIiOiJzeW50aCJ9.SYNTHsig0000','SYNTHsig0000'),
+    ('dsn postgres://app:'+'SynthDbPw1'+'@localhost:5432/db','SynthDbPw1'),('cache redis://:'+REDIS_PW+'@cache:6379',REDIS_PW),
+    ('-----BEGIN '+'PRIVATE KEY-----\nMIISYNTHETICKEYBODY\n-----END PRIVATE KEY-----','MIISYNTHETICKEYBODY'),
+    ('-----BEGIN PGP '+'PRIVATE KEY BLOCK-----\n\nlQOYBSYNTHETICPGPBODY\n-----END PGP PRIVATE KEY BLOCK-----','SYNTHETICPGPBODY'),
+    ('call +1 415 555 0100 now','555 0100'),('call (415) 555-0100 now','555-0100'),
+    ('Authorization: Bearer '+'SYNTHbearer000','SYNTHbearer000'),('mail jane.doe@example.com','jane.doe@example.com'),('ssn 123-45-6789','123-45-6789')]
+ORDINARY=['2026-11-19','API-001','SYNTHETIC-GET-LEAK','LEAD-1a2b3c4d5e6f','v1.0.1','docs/example/probes-vulnerable.json',
+    'Synthetic invoice GET / two fixture identities','Retest: Try a valid actor with another tenant selector and verify it cannot broaden access.',
+    'The password policy requires rotation every 90 days.','Rotate tokens monthly','See https://example.com/runbook','Rollback +3 2026-09-14 release','Due 2026-12-01']
+# Each of these takes seconds when a rule backtracks quadratically.
+LINEAR=['a_'*50000,'ghp_'*25000,'a.'*50000,'eyJ-'*25000]
 
 def test_evidence(result='denied'):
     return {'id':'EV-TEST','kind':'test','ref':'synthetic/probe-results.json','method':'Synthetic scoped test review',
@@ -192,6 +218,35 @@ class OutputGuardTests(unittest.TestCase):
         try:write('out/link/../x.json',{})
         except ValueError:self.fail("'..' was not collapsed before the symlink check")
         self.assertTrue(os.path.isfile('out/x.json'));self.assertFalse(os.path.exists('x.json'));self.assertFalse(os.path.exists('elsewhere/x.json'))
+
+class RedactionTests(unittest.TestCase):
+    def test_clean_redacts_secret_shapes(self):
+        for text,value in SECRET_SHAPES:
+            with self.subTest(text=text):self.assertNotIn(value,clean(text))
+    def test_clean_keeps_scheme_and_host_of_credential_urls(self):
+        out=clean('dsn postgres://app:'+'SynthDbPw1'+'@localhost:5432/db');self.assertIn('postgres://',out);self.assertIn('@localhost:5432/db',out)
+    def test_clean_leaves_ordinary_text(self):
+        for text in ORDINARY:
+            with self.subTest(text=text):self.assertEqual(text,clean(text))
+    def test_clean_masks_phone_but_keeps_following_date(self):
+        out=clean('Paged +1 415 555 0100 on 2026-08-01');self.assertNotIn('555 0100',out);self.assertTrue(out.endswith(' 2026-08-01'),out)
+    def test_clean_is_linear(self):
+        for text in LINEAR:
+            with self.subTest(text=text[:4]):
+                start=time.perf_counter();clean(text);self.assertLess(time.perf_counter()-start,1.0)
+    def test_secret_in_rationale_reaches_no_output(self):
+        a=initialize('Synthetic SaaS','staging');a['evidence']=[test_evidence('leak_observed')]
+        a['checks'][0].update(status='confirmed_gap',reviewer='Synthetic Reviewer',evidence_refs=['EV-TEST'],severity='high',owner='Synthetic Owner',verification_test='Retest',
+            rationale='config/prod.env commits DB_PASSWORD='+PASSWORD+' and '+STRIPE+', cache at redis://:'+REDIS_PW+'@cache:6379',recommendation='Rotate access_token='+TOKEN)
+        self.assertEqual([],validate(a))
+        with tempfile.TemporaryDirectory() as d:
+            report(a,d,True);tasks(a,d);files=sorted(Path(d).iterdir());self.assertEqual(10,len(files))
+            for f in files:
+                data=f.read_bytes()
+                if f.suffix=='.pdf':data=b'\n'.join(zlib.decompress(m.group(1)) for m in re.finditer(rb'stream\n(.*?)\nendstream',data,re.S))
+                self.assertGreater(len(data),0,f.name)
+                for secret in (PASSWORD,STRIPE,TOKEN,REDIS_PW):
+                    with self.subTest(file=f.name,secret=secret[:6]):self.assertNotIn(secret.encode(),data)
 
 class ProbeTests(unittest.TestCase):
     def setUp(self):
