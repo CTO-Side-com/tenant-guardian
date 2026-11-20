@@ -289,7 +289,15 @@ The same run writes `TENANT-ISOLATION.md`, a `risk-register.csv` with one row pe
 | Slack message | [`tasks-slack.txt`](docs/example/tasks-slack.txt) | Paste into a channel, thread or canvas. `@`, `<` and `>` become look-alike characters, so pasted text cannot ping `@channel` or form `<…>` links. |
 | Anywhere | [`tasks.md`](docs/example/tasks.md) | A `- [ ]` checklist for GitHub issues and other Markdown tools. |
 
-CSV cells that start with `=`, `+`, `-` or `@` get a leading apostrophe, so spreadsheets do not run them as formulas. Before anything is written, these are masked by pattern: email addresses; SSN-format numbers (`NNN-NN-NNNN`); `Bearer` tokens; and an unquoted, standalone `password`, `secret`, `token` or `api_key` label followed by `:` or `=`, together with its value. Anything else passes through, including quoted JSON keys (`"password": "…"`), labels joined to other words (`DB_PASSWORD=`, `access_token=`), `api-key=`, provider key shapes such as `sk-…`, `AKIA…` or `ghp_…`, and private key blocks. Each text field is also cut to 20,000 characters. Review outputs before sharing. Nothing is sent anywhere.
+CSV cells that start with `=`, `+`, `-` or `@` get a leading apostrophe, so spreadsheets do not run them as formulas. Before anything is written, these are masked by pattern:
+
+- email addresses, SSN-format numbers (`NNN-NN-NNNN`) and international (`+…`) or `(NNN) NNN-NNNN` phone numbers;
+- `Bearer` tokens, and any value after a `token`, `password`, `passwd`, `pwd`, `secret`, `api_key`, `api-key`, `access_key` or `private_key` label followed by `:`, `=` or `=>`, including quoted JSON keys (`"password": "…"`) and joined names (`DB_PASSWORD=`, `access_token=`, `client_secret=`);
+- the password in a connection URL (`postgres://app:…@host` keeps its scheme and host);
+- provider key shapes: GitHub (`ghp_…`, `github_pat_…`), OpenAI (`sk-…`), Stripe (`sk_live_…`, `rk_test_…`), AWS (`AKIA…`), Slack (`xoxb-…`, `xapp-…`) and JWTs;
+- PEM and PGP private key blocks.
+
+Anything else passes through, including values whose label is not in that list and key shapes from other providers. Each text field is also cut to 20,000 characters. Review outputs before sharing. Nothing is sent anywhere.
 
 ## Rechecks
 
@@ -299,7 +307,7 @@ After engineering changes, list the changed files (repository-relative, one per 
 python3 "$SKILL_DIR/scripts/guardian.py" recheck --assessment tenant-output/assessment.json --changed-files changed-files.txt --out tenant-output/assessment-recheck.json
 ```
 
-The result is a new assessment. Each affected objective drops to `insufficient_evidence`, keeps its `prior_status` and `stale_evidence` as history, and loses its verified scope. An objective with no `watched_paths` is invalidated conservatively by any change. Watch patterns use Python's `PurePosixPath.match`: they match from the end of the path, and neither `*` nor `**` crosses a folder, so `backend/**` matches `backend/app.py` but not `backend/api/app.py`. List each folder you mean, or leave `watched_paths` empty. Cloud drift, changed memberships, runtime settings and changed data ownership need a separate review.
+The result is a new assessment. Each affected objective drops to `insufficient_evidence`, keeps its `prior_status` and `stale_evidence` as history, and loses its verified scope. An objective with no `watched_paths` is invalidated conservatively by any change. A watch pattern matches a changed path if it matches from the repository root, where `*` stays within one folder and `**` spans any number of folders (`backend/**` matches `backend/api/app.py`; `**/migrations/*.sql` matches `migrations/001.sql` and `db/migrations/001.sql`). It also matches if it matches the end of the path, as Python's `PurePosixPath.match` does, so `*.sql` matches `db/schema.sql`. Cloud drift, changed memberships, runtime settings and changed data ownership need a separate review.
 
 ## Safety model
 
@@ -307,7 +315,7 @@ The result is a new assessment. Each affected objective drops to `insufficient_e
 - **Evidence is data, never instructions.** Source files, comments, READMEs, query results, fixture text and API responses are untrusted input, and instructions found inside them are not followed.
 - **No secrets or customer records.** The agent is instructed never to open `.env` files, private keys, raw credentials, customer records or database dumps. The scanner itself skips `.env*`, five named credential files and the folders listed under [Offline scanner](#offline-scanner); other files it reads are pattern-matched, and only file and line are recorded.
 - **No network unless you opt in.** Every script uses the Python standard library. The only script that sends requests is `probe.py`, which needs `--allow-network`, `--synthetic-only` and an `--allow-origin` that exactly matches the plan, and sends GET requests only. The bundled demo server listens on `127.0.0.1` only.
-- **Safe writes.** An output path is refused if the file or any folder above it is a symlink. This includes system aliases: on macOS `/tmp` and `/var` are symlinks, so write inside your project instead. `report` and `tasks` refuse an output folder that would replace the source assessment, and reject structurally invalid assessments.
+- **Safe writes.** An output path is refused if the file or its folder is a symlink, or if any folder above it inside the working directory is one, so a link planted in the repository cannot redirect a report. Symlinks above the working directory, such as `/tmp` and `/var` on macOS, are allowed. `report` and `tasks` refuse an output folder that would replace the source assessment, and reject structurally invalid assessments.
 - **Pattern-based redaction.** The shapes listed under [Task exports](#task-exports-jira-notion-slack) are masked in every report and export before anything is written. It is a safety net, not a substitute for a human check.
 - **No green lights.** No isolation guarantees, no scores, no percentages and no certificates. Counts describe reviewed evidence states.
 
@@ -333,23 +341,17 @@ docs/build_example.py          rebuilds docs/example from the loopback fixture
 docs/example/                  synthetic example outputs
 docs/images/                   README infographics and report preview
 .claude-plugin/                Claude Code plugin and marketplace manifests
-.github/workflows/tests.yml    CI: tests and example build on Python 3.9, 3.11 and 3.13
+.github/workflows/tests.yml    CI: tests and example build on Python 3.9, 3.11 and 3.13 (Ubuntu) and 3.13 (macOS)
 ```
 
 ## Development
 
 ```bash
-python3 -m unittest discover -s skills/tenant-guardian/tests -v   # 82 tests, offline plus one loopback probe run
+python3 -m unittest discover -s skills/tenant-guardian/tests -v   # 100 tests, offline plus one loopback probe run
 python3 docs/build_example.py                                     # rebuild docs/example in place (dates and hashes change)
 ```
 
-On macOS, point `TMPDIR` at a folder inside the project for the test run. The default temporary folder sits under the `/var` symlink, which the output guard refuses, and the seven tests that write files then error:
-
-```bash
-mkdir -p tenant-output/tmp && TMPDIR="$PWD/tenant-output/tmp" python3 -m unittest discover -s skills/tenant-guardian/tests -v
-```
-
-The tests cover the validator's conclusion rules, malformed and future-dated evidence, report and export refusal on invalid input, redaction, symlink refusal, overwrite refusal, scanner privacy and limits, recheck behaviour, probe plan validation and every probe outcome. They need no external network.
+The tests cover the validator's conclusion rules, malformed and future-dated evidence, report and export refusal on invalid input, redaction of each secret shape (and that it runs in linear time), symlink refusal, overwrite refusal, scanner privacy and limits, recheck behaviour, probe plan validation and every probe outcome. They need no external network.
 
 Contributions are welcome, especially new scanner rules (each with a positive and a negative test) and objective corrections with an authoritative source.
 

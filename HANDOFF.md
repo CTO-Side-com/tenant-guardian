@@ -1,10 +1,10 @@
 ---
 status: active
-phase: v1.0.0 · Published
-next: v1.0.1 · Hardening from SOC 2 v1.1 (Needs you)
-tests: CI 82/82 on Python 3.9.25/3.11/3.13 + example build, run 44748481642 green; macOS local 82/82 with TMPDIR inside the project, 75/82 under the default TMPDIR (2026-11-20)
+phase: v1.0.1 · Hardening (local branch v1.0.1)
+next: TG-11 · Final review of v1.0.1
+tests: unit 100/100 on macOS, Python 3.13.0 and 3.9.6, default TMPDIR (2026-11-20 18:11); CI last green on v1.0.0 (82/82, run 44748481642)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-20 17:58 +0400
+updated: 2026-11-20 18:11 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -26,6 +26,9 @@ updated: 2026-11-20 17:58 +0400
 - 2026-11-20 session: README rewritten; five SVG infographics and a PDF preview added under
   `docs/images/`; this HANDOFF added. No code, manifest, test or example output changed. Final
   review (TG-3) found 4 overclaims and 9 minor gaps, all applied 17:47.
+- v1.0.1 on local branch `v1.0.1` (not yet merged or pushed): `aa07683` output guard (TG-6),
+  `3af727c` recheck `**` (TG-7), `7fe564c` redaction (TG-8), `1386ba1` CI (TG-9), then the TG-10
+  docs and manifests commit. Manifests read 1.0.1.
 
 ## What's working
 
@@ -37,31 +40,25 @@ updated: 2026-11-20 17:58 +0400
 - `scripts/probe.py`: two synthetic tenants, own-tenant positive controls first, then
   `leak_observed` / `denied` / `inconclusive`; dry run; `--allow-network`, `--synthetic-only` and an
   exact `--allow-origin` required; HTTPS unless loopback.
-- Tests: 82 in `skills/tenant-guardian/tests`, including a loopback run of both fixture modes.
-  `docs/build_example.py` rebuilt the example on a scratch copy: vulnerable 2/2 `leak_observed`,
-  isolated 2/2 `denied`; the rebuilt `TENANT-ISOLATION.md` matches the shipped one apart from dates
-  and hashes.
-- CI (`.github/workflows/tests.yml`): ubuntu-24.04, Python 3.9/3.11/3.13, unit tests and example
-  build; green since `6943002`.
+- Tests: 100 in `skills/tenant-guardian/tests` (82 in v1.0.0), including a loopback run of both
+  fixture modes, 8 output-guard tests, 4 recheck pattern tests and 6 redaction tests (secret shapes,
+  ordinary text kept, no secret in any output file including PDF streams, linear time under 1 s).
+  All pass on macOS under the default TMPDIR. `docs/build_example.py` rebuilt the example on a scratch
+  copy with the v1.0.1 code: it differs from the shipped one in dates and port-derived hashes only.
+- CI (`.github/workflows/tests.yml`): ubuntu-24.04 × Python 3.9/3.11/3.13 plus macos-latest × 3.13,
+  `fail-fast: false`, checkout/setup-python v7, unit tests and example build. Green on `main` since
+  `6943002`; the v1.0.1 workflow has not run yet.
 - Docs: README with ASCII banner, badges, five infographics (`outputs`, `workflow`, `boundary-map`,
   `evidence-model`, `probe-oracle`) and `report-preview.png`; a scratch link check resolved 38/38
   local links and anchors after the review fixes and caught both planted breaks.
 
 ## Known problems
 
-- **Symlink guard too strict on macOS.** `output()` in `scripts/guardian.py:24` refuses a path when
-  any folder above it is a symlink. `/var` and `/tmp` are symlinks on macOS, so 7 tests error under
-  the default TMPDIR and `--out /tmp/...` is refused. CI is Ubuntu-only and never shows it. SOC 2 v1.1
-  fixed the same guard (SG-1: check the file, its folder, and folders inside the working directory).
-  Verified 2026-11-20; README documents the TMPDIR workaround.
-- **Recheck fails open on nested changes.** `PurePosixPath.match` never crosses a folder, so
-  `watched_paths: ["backend/**"]` keeps an objective's conclusion when `backend/sub/x.py` changes.
-  Verified 2026-11-20 (same bug as SOC 2's correction prompt 2). README documents the behaviour.
-- **Redaction is narrower than SOC 2 v1.1's.** `clean()` masks emails, SSN-format numbers, `Bearer`
-  tokens and values after a standalone `password`/`secret`/`token`/`api_key` label. Verified to miss
-  `DB_PASSWORD=`, `access_token=`, `api-key=` and `sk-…` (2026-11-20); has no pattern for `AKIA…`,
-  `ghp_…`, bare JWTs or PEM blocks. Quoted JSON keys (`"password": "x"`) also pass through, since
-  the quote sits between label and colon (verified 2026-11-20). README lists exactly what is masked.
+- **Redaction is pattern-based.** v1.0.1 masks what SOC 2 v1.1 masks (README, Task exports, lists
+  it). Values after a label not in its list, and key shapes from other providers, still pass through.
+- **CSV cells starting with a bare tab or CR are not prefixed.** `cell()` prefixes `=`, `+`, `-`, `@`
+  (after leading whitespace), but not a leading tab or CR on its own, which SOC 2's `csv_safe`
+  also neutralizes. Out of v1.0.1's scope; a candidate for the next patch.
 - **Scanner skip list is exact-name only.** `SKIP` in `scripts/guardian.py:132` is case-sensitive
   folder names, so `fixture/`, `vendor/` or a dump in `db/` is read (TG-3 confirmed; file and line
   only are recorded). `.rs`, `.kt`, `.mjs` and `.vue` are not scanned. README lists the exact names.
@@ -73,7 +70,17 @@ updated: 2026-11-20 17:58 +0400
 - CI rebuilds the example without diffing it against `docs/example/`.
 - Fixed in TG-5: the first CI run (44748304856) failed before any test ran, because `ubuntu-latest`
   is now Ubuntu 26.04 and setup-python has no 3.9 build for it. Runner pinned to `ubuntu-24.04`, as
-  SOC 2 did. Still behind SOC 2's workflow: `fail-fast: false`, checkout/setup-python v7.
+  SOC 2 did.
+- Fixed in v1.0.1, each with tests watched red first:
+  - TG-6: `output()` refused any symlinked folder above the path, so macOS `/var` and `/tmp` broke
+    7 tests and `--out /tmp/...`. It now refuses the file, its folder and symlinks inside the
+    working directory only (SOC 2 SG-1). Red: 8 errors and 1 failure under the default TMPDIR.
+  - TG-7: recheck's `PurePosixPath.match` never let `**` cross a folder, so `backend/**` failed
+    open on `backend/api/x.py`. A root-anchored match where `**` spans folders is added.
+  - TG-8: `clean()` missed joined labels, quoted JSON keys, provider keys, URL passwords, PEM
+    blocks and phones, and its email pattern was quadratic (30 s on 100k chars of `a.`). Ported
+    SOC 2 v1.1's patterns: 0.07 s on the same input.
+  - TG-9: CI gained a macOS job, `fail-fast: false` and v7 actions.
 
 ## Decisions
 
@@ -85,6 +92,9 @@ updated: 2026-11-20 17:58 +0400
 - [x] 2026-11-20 · Apply all 13 TG-3 findings, including the section reorder (Install, Use it and
       Example now follow "How an assessment runs"). The review report stayed in the session
       scratchpad; its findings are folded into Known problems.
+- [x] 2026-11-20 · v1.0.1 bumps the plugin manifests only. `references/checks.json` stays at 1.0.0:
+      it is the catalog version that `validate` matches against `catalog_version`, and the catalog
+      did not change, so existing assessments stay valid.
 - [x] 2026-11-20 · Publish now as v1.0.0 (answered 17:50, "publish"): `git init`, import v1.0.0 as
       received as the first commit, then the docs commit, then the marketplace rename; create public
       `CTO-Side-com/tenant-guardian` with the siblings' homepage and topic style, push `main`.
@@ -123,7 +133,7 @@ updated: 2026-11-20 17:58 +0400
 | TG-7 | Recheck: `**` crosses folders | done | 2026-11-20 18:06 | 2026-11-20 18:07 |
 | TG-8 | Widen redaction (security-critical) | done | 2026-11-20 18:07 | 2026-11-20 18:09 |
 | TG-9 | CI: macOS job, fail-fast off, v7 actions | done | 2026-11-20 18:09 | 2026-11-20 18:10 |
-| TG-10 | README, HANDOFF, manifests 1.0.1 | active | 2026-11-20 18:10 | |
+| TG-10 | README, HANDOFF, manifests 1.0.1 | done | 2026-11-20 18:10 | 2026-11-20 18:11 |
 | TG-11 | Final review of v1.0.1 (security-critical) | todo | | |
 
 ## Regenerate the README preview
@@ -174,11 +184,11 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. On branch `v1.0.1`, TG-6 to TG-10 in order, each with a test watched red before the fix and one
-   commit per task (`Task: TG-n` trailer).
-2. TG-11: dispatch the final review (general-purpose, strongest model, high effort); apply its
-   confirmed findings.
-3. Merge `v1.0.1` into `main`, push, watch CI (Ubuntu 3.9/3.11/3.13 and the macOS job).
+1. TG-11: dispatch the final review of `main..v1.0.1` (general-purpose, strongest model, high
+   effort); apply its confirmed findings, one commit each.
+2. Fast-forward `main` to `v1.0.1`, list the files, push, watch CI (Ubuntu 3.9/3.11/3.13 and the
+   macOS job).
+3. Update this file: TG-11 done, front matter (phase v1.0.1 · Published, CI run and counts).
 
 ## In flight
 
