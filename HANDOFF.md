@@ -1,10 +1,10 @@
 ---
 status: active
-phase: v1.0.2 · Publish
-next: push v1.0.2, then Needs you
-tests: local macOS 109/109 on 3.13.0 and 3.9.6 at 4498884 (2026-11-21); CI pending for v1.0.2
+phase: v1.0.2 · Published
+next: Needs you (release tag, rooted / watched paths)
+tests: CI 109/109 on Ubuntu 3.9/3.11/3.13 (2 case-variant tests skipped there) and macOS 3.13 (0 skipped), run 44812449690 green; local macOS 109/109 on 3.13.0 and 3.9.6 (2026-11-21)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-21 00:33 +0400
+updated: 2026-11-21 00:35 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -31,7 +31,12 @@ updated: 2026-11-21 00:33 +0400
   `3af727c` recheck `**` (TG-7), `7fe564c` redaction (TG-8), `1386ba1` CI (TG-9), `4fa3f0a` docs
   and manifests (TG-10), TG-11 fixes `4b7bea3`, `6940508`, `4697b2c` (docs) and `e5b6d7b`, then
   `c61a552` (docs). Manifests read 1.0.1. `20da0e4` (this HANDOFF's release notes) followed; CI run
-  44754209342 green on all 4 jobs. Last commit before this update: `20da0e4`.
+  44754209342 green on all 4 jobs.
+- v1.0.2 pushed 2026-11-21 00:33: `main` fast-forwarded from `f8f9817` to `7489bf0`. Commits:
+  `1968ccc` folder patterns (TG-12), `e8431f8` CSV tab/CR (TG-13), `efb71f0` docs and manifests
+  (TG-14), TG-15 fixes `1fd54d5` (test) and `4498884` (docs), `7489bf0` (HANDOFF). CI run
+  44812449690 green on all 4 jobs: 109 tests each, Ubuntu skipped=2, macOS 0 skipped. Manifests read
+  1.0.2. Last commit before this update: `7489bf0`.
 
 ## What's working
 
@@ -51,7 +56,7 @@ updated: 2026-11-21 00:33 +0400
   every CSV is byte-identical.
 - CI (`.github/workflows/tests.yml`): ubuntu-24.04 × Python 3.9/3.11/3.13 plus macos-latest × 3.13,
   `fail-fast: false`, checkout/setup-python v7, unit tests and example build. Green on `main` since
-  `6943002`; v1.0.1 run 44753789907 green on all 4 jobs.
+  `6943002`; v1.0.1 run 44753789907 and v1.0.2 run 44812449690 green on all 4 jobs.
 - Docs: README with ASCII banner, badges, five infographics (`outputs`, `workflow`, `boundary-map`,
   `evidence-model`, `probe-oracle`) and `report-preview.png`; a scratch link check resolved 38/38
   local links and anchors after the review fixes and caught both planted breaks.
@@ -256,15 +261,11 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. If `main` on GitHub is not yet at this commit: `git switch main`, `git merge --ff-only v1.0.2`,
-   list the files in `origin/main..main`, `git push origin main` (authorized 2026-11-21 00:19).
-2. Watch the CI run for that push; record its ID and result here.
-3. Still open in Needs you: the GitHub release tag and rooted `/` watched paths. Optional: why the
-   loopback probe test takes 36 s on the macOS runner.
+1. Wait for the Needs-you answers: the GitHub release tag, and rooted `/` watched paths.
+2. Optional: find out why the loopback probe test takes 36 s on the macOS runner (36.7 s in run
+   44812449690, against 1.6 to 1.8 s on Ubuntu).
 
 ## In flight
 
-- v1.0.2 merge and push: `v1.0.2` fast-forwards into `main`, then `git push origin main`. TG-15
-  review and re-check are done (report `<session scratchpad>/tg15-review.md`,
-  verdict ship; its worktree is removed).
-- Local branch `v1.0.1` is fully merged into `main` (kept).
+- Nothing. v1.0.2 is merged and pushed. Local branches `v1.0.1` and `v1.0.2` are fully merged into
+  `main` (kept).
