@@ -1,10 +1,10 @@
 ---
 status: active
-phase: v1.0.2 · Review
-next: TG-15 · final review of v1.0.2
-tests: local macOS 109/109 on 3.13.0 and 3.9.6 (2026-11-21); CI 104/104 on main (run 44753789907)
+phase: v1.0.2 · Publish
+next: push v1.0.2, then Needs you
+tests: local macOS 109/109 on 3.13.0 and 3.9.6 at 4498884 (2026-11-21); CI pending for v1.0.2
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-21 00:31 +0400
+updated: 2026-11-21 00:33 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -127,7 +127,8 @@ updated: 2026-11-21 00:31 +0400
     `cell()` agrees with SOC 2's `csv_safe` on every generated input. P1 (string-prefix folder
     compare) failed the lookalike guard test on its own assertion. Findings, all minor:
     - 1: P3 (prefix any cell with leading whitespace) passed all 109. The CSV test now also
-      requires `' team a'` and `'  note'` to stay unprefixed; the reviewer re-runs P3 against it.
+      requires `' team a'` and `'  note'` to stay unprefixed (`1fd54d5`). Re-check at `4498884`:
+      P3 now fails it on its own assertions (`AssertionError: True is not false`, failures=2).
     - 2, 3: README's CSV sentence (a `\n` before a tab skips the prefix, as in SOC 2) and its
       contradictory `*.sql` sentence reworded.
     - 4: absolute watched paths, filed under Known problems and Needs you.
@@ -205,7 +206,7 @@ updated: 2026-11-21 00:31 +0400
 | TG-12 | Recheck: a pattern naming a folder covers the files under it | done | 2026-11-21 00:20 | 2026-11-21 00:21 |
 | TG-13 | CSV: prefix cells starting with a tab or CR | done | 2026-11-21 00:21 | 2026-11-21 00:22 |
 | TG-14 | README, HANDOFF, manifests 1.0.2 | done | 2026-11-21 00:22 | 2026-11-21 00:23 |
-| TG-15 | Final review of v1.0.2 | active | 2026-11-21 00:23 | |
+| TG-15 | Final review of v1.0.2 | done | 2026-11-21 00:23 | 2026-11-21 00:33 |
 
 ## Regenerate the README preview
 
@@ -255,19 +256,15 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. Read the reviewer's P3 re-check (path under In flight). It must fail the CSV test on its own
-   assertion; if not, strengthen the test and ask again.
-2. Re-run the gate (unit tests on 3.13 and 3.9), fast-forward `main` to `v1.0.2`, list the files,
-   push (authorized 2026-11-21 00:19), watch CI.
-3. Record the push, CI run and last commit here; tick TG-15.
-4. Still open in Needs you: the GitHub release tag and rooted `/` watched paths. Optional: why the
+1. If `main` on GitHub is not yet at this commit: `git switch main`, `git merge --ff-only v1.0.2`,
+   list the files in `origin/main..main`, `git push origin main` (authorized 2026-11-21 00:19).
+2. Watch the CI run for that push; record its ID and result here.
+3. Still open in Needs you: the GitHub release tag and rooted `/` watched paths. Optional: why the
    loopback probe test takes 36 s on the macOS runner.
 
 ## In flight
 
-- TG-15 review done (report `/private/tmp/claude-501/-Users-rezasahebozamani-Projects-Skills-tenant-guardian/3f109410-cac2-49a7-8dc1-c461a5b7b403/scratchpad/tg15-review.md`,
-  verdict ship). TG-15 re-check: the same `reviewer` agent re-runs plant P3 against the extended CSV
-  test on `v1.0.2` HEAD, in a fresh throwaway worktree `.../scratchpad/tg15-wt`; result appended
-  to `tg15-review.md` under "Re-check". If the session restarted, the agent is dead: re-dispatch
-  a `reviewer` with P3 from `.../scratchpad/tg15/plants.py`.
+- v1.0.2 merge and push: `v1.0.2` fast-forwards into `main`, then `git push origin main`. TG-15
+  review and re-check are done (report `<session scratchpad>/tg15-review.md`,
+  verdict ship; its worktree is removed).
 - Local branch `v1.0.1` is fully merged into `main` (kept).
