@@ -47,8 +47,9 @@ def clean(s):
     s=re.sub(r'\b(?:gh[pousr]_[A-Za-z0-9_]+|github_pat_[A-Za-z0-9_]+|sk-[A-Za-z0-9_-]{16,}|[sr]k_(?:live|test)_[A-Za-z0-9_]{16,}|AKIA[0-9A-Z]{16}|(?:xox[abeprs]|xapp)-[A-Za-z0-9-]+|(?<!-)eyJ[\w-]+\.eyJ[\w-]+\.[\w-]+)\b','[REDACTED_SECRET]',s)
     return s[:20000]
 def cell(s):
-    s=clean(s).replace('\n',' ').replace('\r',' ')
-    return "'"+s if s.lstrip().startswith(('=','+','-','@')) else s
+    head=clean(s)  # checked before CR is flattened, so a leading tab or CR still counts (as in SOC 2's csv_safe)
+    s=head.replace('\n',' ').replace('\r',' ')
+    return "'"+s if head.lstrip(' ').startswith(('\t','\r')) or s.lstrip().startswith(('=','+','-','@')) else s
 def scrub(x):
     if isinstance(x,dict):return {k:scrub(v) for k,v in x.items()}
     if isinstance(x,list):return [scrub(v) for v in x]

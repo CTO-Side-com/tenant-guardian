@@ -111,6 +111,11 @@ class AssessmentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             tasks(self.a,d);text=Path(d,'tasks-slack.txt').read_text();self.assertNotIn('@channel',text);self.assertNotIn('<https',text);self.assertNotIn('person@example.com',text)
         self.assertTrue(cell('  =SUM(1,2)').startswith("'"))
+    def test_csv_cell_prefixes_leading_tab_and_cr(self):
+        for s in ('\tcmd','\rcmd',' \tcmd','  \r\ncmd'):
+            with self.subTest(value=s):v=cell(s);self.assertTrue(v.startswith("'"));self.assertNotIn('\r',v);self.assertNotIn('\n',v)
+        for s in ('team a','a\tb','a\rb'):
+            with self.subTest(value=s):self.assertFalse(cell(s).startswith("'"))
     def test_symlink_output_refused(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d,'sentinel');p.write_text('keep');Path(d,'TENANT-ISOLATION.md').symlink_to(p)

@@ -1,7 +1,7 @@
 ---
 status: active
 phase: v1.0.2 · Build
-next: TG-13 · CSV tab and CR prefix
+next: TG-14 · docs and manifests 1.0.2
 tests: CI 104/104 on Ubuntu 3.9/3.11/3.13 (2 case-variant tests skipped there) and macOS 3.13 (0 skipped), run 44753789907 green; local macOS 104/104 on 3.13.0 and 3.9.6 (2026-11-20)
 live: https://github.com/CTO-Side-com/tenant-guardian
 updated: 2026-11-21 00:20 +0400
@@ -175,8 +175,8 @@ updated: 2026-11-21 00:20 +0400
 | TG-10 | README, HANDOFF, manifests 1.0.1 | done | 2026-11-20 18:10 | 2026-11-20 18:11 |
 | TG-11 | Final review of v1.0.1 (security-critical) | done | 2026-11-20 18:12 | 2026-11-20 18:28 |
 | TG-12 | Recheck: a pattern naming a folder covers the files under it | done | 2026-11-21 00:20 | 2026-11-21 00:21 |
-| TG-13 | CSV: prefix cells starting with a tab or CR | active | 2026-11-21 00:21 | |
-| TG-14 | README, HANDOFF, manifests 1.0.2 | todo | | |
+| TG-13 | CSV: prefix cells starting with a tab or CR | done | 2026-11-21 00:21 | 2026-11-21 00:22 |
+| TG-14 | README, HANDOFF, manifests 1.0.2 | active | 2026-11-21 00:22 | |
 | TG-15 | Final review of v1.0.2 | todo | | |
 
 ## Regenerate the README preview
