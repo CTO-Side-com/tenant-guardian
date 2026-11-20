@@ -90,6 +90,11 @@ updated: 2026-11-20 17:58 +0400
       `CTO-Side-com/tenant-guardian` with the siblings' homepage and topic style, push `main`.
       v1.0.1 hardening stays open.
 - [x] 2026-11-20 · Marketplace name `ctoside-tenant` (answered 17:51).
+- [x] 2026-11-20 · Build v1.0.1 (answered 18:02 "yes"): narrowed output symlink guard, `**` that
+      crosses folders in recheck, redaction widened toward SOC 2 v1.1, CI with a macOS job,
+      `fail-fast: false` and v7 actions; README, HANDOFF and manifests at 1.0.1. In-session on branch
+      `v1.0.1`, one commit per change, final review by general-purpose (strongest model, high effort:
+      redaction and the output guard are security-critical), then merge to `main` and push.
 
 ## Needs you
 
@@ -97,8 +102,9 @@ updated: 2026-11-20 17:58 +0400
       README install line, as SOC 2 did with `ctoside-soc2`? (recommend rename; answered: rename)
 - [x] 2026-11-20 · `git init` with v1.0.0 as received as the initial commit, then this docs change as
       a second commit? (recommended; answered by "publish")
-- [ ] 2026-11-20 · v1.0.1 hardening from SOC 2 v1.1: narrowed symlink guard, nested-folder recheck,
-      wider redaction, `macos-latest` in the CI matrix? (recommend yes)
+- [x] 2026-11-20 · v1.0.1 hardening from SOC 2 v1.1: narrowed symlink guard, nested-folder recheck,
+      wider redaction, `macos-latest` in the CI matrix? (recommend yes; answered 18:02 "yes", push
+      when done)
 - [x] 2026-11-20 · Publish to public `CTO-Side-com/tenant-guardian` with the siblings' homepage and
       topics? (answered 17:50: "publish", before v1.0.1)
 
@@ -113,6 +119,12 @@ updated: 2026-11-20 17:58 +0400
 | TG-3 | Final review of README and images against the code | done | 2026-11-20 17:38 | 2026-11-20 17:47 |
 | TG-4 | Rename marketplace to `ctoside-tenant` | done | 2026-11-20 17:51 | 2026-11-20 17:55 |
 | TG-5 | Publish: git init, commits, public repo, push, CI | done | 2026-11-20 17:51 | 2026-11-20 17:58 |
+| TG-6 | Narrow the output symlink guard (security-critical) | done | 2026-11-20 18:03 | 2026-11-20 18:06 |
+| TG-7 | Recheck: `**` crosses folders | active | 2026-11-20 18:06 | |
+| TG-8 | Widen redaction (security-critical) | todo | | |
+| TG-9 | CI: macOS job, fail-fast off, v7 actions | todo | | |
+| TG-10 | README, HANDOFF, manifests 1.0.1 | todo | | |
+| TG-11 | Final review of v1.0.1 (security-critical) | todo | | |
 
 ## Regenerate the README preview
 
@@ -162,13 +174,13 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. Answer the v1.0.1 item under Needs you.
-2. v1.0.1 hardening, each fix with a red-then-green test: narrowed symlink guard, nested-folder
-   recheck, wider redaction, `macos-latest` in CI (plus `fail-fast: false` and the v7 actions SOC 2
-   uses). Update the README lines that describe today's behaviour (macOS TMPDIR note, recheck
-   patterns, redaction list, skip list) and bump both manifests to 1.0.1.
-3. Push only when you say so.
+1. On branch `v1.0.1`, TG-6 to TG-10 in order, each with a test watched red before the fix and one
+   commit per task (`Task: TG-n` trailer).
+2. TG-11: dispatch the final review (general-purpose, strongest model, high effort); apply its
+   confirmed findings.
+3. Merge `v1.0.1` into `main`, push, watch CI (Ubuntu 3.9/3.11/3.13 and the macOS job).
 
 ## In flight
 
-- Nothing running. v1.0.0 published; working tree clean after this HANDOFF commit.
+- v1.0.1 started 2026-11-20 18:03 on local branch `v1.0.1` (not pushed). Uncommitted work on that
+  branch is unfinished work of the active task in the table.

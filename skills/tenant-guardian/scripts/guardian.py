@@ -4,6 +4,7 @@ import copy
 import csv
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import re
 from datetime import date,datetime,timezone
@@ -22,8 +23,13 @@ def iso(s):
     return date.fromisoformat(s)
 def present(v):return isinstance(v,str) and v.strip().upper() not in ('','UNKNOWN','TBD','UNASSIGNED','N/A')
 def output(path):
-    p=Path(path).absolute()
-    if any(x.is_symlink() for x in [p,*p.parents]):raise ValueError('Symlink output paths are refused')
+    # System aliases above the working directory (macOS /var -> /private/var) are trusted; a symlink
+    # planted inside it, or as the file or its folder, is not. abspath collapses '..' before the check.
+    p=Path(os.path.abspath(path));root=os.stat(os.getcwd())
+    def inside(a):  # compared by file identity, since names can differ in case
+        r=Path(os.path.realpath(a.parent))
+        return any(os.path.exists(x) and os.path.samestat(os.stat(x),root) for x in (r,*r.parents))
+    if p.is_symlink() or p.parent.is_symlink() or any(a.is_symlink() for a in p.parents if inside(a)):raise ValueError('Symlink output paths are refused')
     p.parent.mkdir(parents=True,exist_ok=True);return p
 def write(path,data,overwrite=False):
     with output(path).open('w' if overwrite else 'x',encoding='utf-8') as f:json.dump(data,f,indent=2,ensure_ascii=True);f.write('\n')

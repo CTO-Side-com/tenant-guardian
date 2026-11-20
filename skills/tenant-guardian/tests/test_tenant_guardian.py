@@ -138,6 +138,50 @@ class AssessmentTests(unittest.TestCase):
         p=subprocess.run([sys.executable,str(ROOT/'scripts/guardian.py'),'scan','--repo','/not/a/real/tenant/repo','--out','unused.json'],capture_output=True,text=True)
         self.assertNotEqual(0,p.returncode);self.assertNotIn('Traceback',p.stderr)
 
+class OutputGuardTests(unittest.TestCase):
+    def in_tmp(self,sub=False):
+        tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup);old=os.getcwd();os.chdir(tmp.name);self.addCleanup(os.chdir,old)
+        os.makedirs('out/real/sub' if sub else 'out/real');os.symlink('real','out/link');return tmp.name
+    def outside(self):
+        tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup);old=os.getcwd();self.addCleanup(os.chdir,old)
+        for d in ('work','real/sub'):os.makedirs(os.path.join(tmp.name,d))
+        os.symlink('real',os.path.join(tmp.name,'link'));os.chdir(os.path.join(tmp.name,'work'));return tmp.name
+    def test_planted_symlink_folder_inside_cwd_is_refused(self):
+        self.in_tmp()
+        with self.assertRaises(ValueError):write('out/link/report.json',{})
+        self.assertEqual([],os.listdir('out/real'))
+    def test_planted_symlink_deeper_in_path_is_refused(self):
+        self.in_tmp(True)
+        with self.assertRaises(ValueError):write('out/link/sub/report.json',{})
+        self.assertEqual([],os.listdir('out/real/sub'))
+    def test_alias_path_to_planted_symlink_is_refused(self):
+        name=self.in_tmp(True)
+        with self.assertRaises(ValueError):write(os.path.join(name,'out','link','sub','report.json'),{})
+        self.assertEqual([],os.listdir('out/real/sub'))
+    def test_dotdot_cannot_sidestep_guard(self):
+        self.in_tmp(True)
+        with self.assertRaises(ValueError):write('out/real/../link/sub/report.json',{})
+        self.assertEqual([],os.listdir('out/real/sub'))
+    def test_case_variant_path_to_planted_symlink_is_refused(self):
+        self.in_tmp(True);cwd=os.getcwd();up=cwd.upper()
+        if up==cwd or not os.path.isdir(up):self.skipTest('case-sensitive filesystem: no case-variant alias of the working directory')
+        with self.assertRaises(ValueError):write(up+'/out/link/sub/report.json',{})
+        self.assertEqual([],os.listdir('out/real/sub'))
+    def test_symlinked_parent_outside_cwd_is_refused(self):
+        name=self.outside()
+        with self.assertRaises(ValueError):write('../link/report.json',{})
+        self.assertEqual(['sub'],os.listdir(os.path.join(name,'real')))
+    def test_symlink_above_output_folder_outside_cwd_is_allowed(self):
+        # The macOS case: /var and /tmp are symlinks above every temporary folder.
+        name=self.outside();write(os.path.join(name,'link','sub','report.json'),{})
+        self.assertTrue(os.path.isfile(os.path.join(name,'real','sub','report.json')))
+    def test_dotdot_is_normalised_before_checking(self):
+        tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup);old=os.getcwd();os.chdir(tmp.name);self.addCleanup(os.chdir,old)
+        os.makedirs('out');os.makedirs('elsewhere');os.symlink('../elsewhere','out/link')
+        try:write('out/link/../x.json',{})
+        except ValueError:self.fail("'..' was not collapsed before the symlink check")
+        self.assertTrue(os.path.isfile('out/x.json'));self.assertFalse(os.path.exists('x.json'));self.assertFalse(os.path.exists('elsewhere/x.json'))
+
 class ProbeTests(unittest.TestCase):
     def setUp(self):
         self.p=json.loads((ROOT/'assets/probe-plan.json').read_text())
