@@ -1,17 +1,23 @@
 ---
 status: active
-phase: v1.0.0 · Docs refresh
-next: Your calls under Needs you (git, marketplace name, v1.0.1, publish)
-tests: unit 82/82 with TMPDIR inside the project (3.9.6 and 3.13.0); 75/82 under the macOS default TMPDIR (7 symlink-guard errors); example build green (2026-11-20)
-updated: 2026-11-20 17:48 +0400
+phase: v1.0.0 · Published
+next: v1.0.1 · Hardening from SOC 2 v1.1 (Needs you)
+tests: CI 82/82 on Python 3.9.25/3.11/3.13 + example build, run 44748481642 green; macOS local 82/82 with TMPDIR inside the project, 75/82 under the default TMPDIR (2026-11-20)
+live: https://github.com/CTO-Side-com/tenant-guardian
+updated: 2026-11-20 17:58 +0400
 ---
 # Tenant Guardian: handoff
 
 ## Current state
 
-- v1.0.0 as received: an extracted ZIP dated 2026-11-20 00:13, manifests at 1.0.0. **Not a git
-  repository and not published**: `CTO-Side-com/tenant-guardian` does not exist yet, so there is no
-  last commit.
+- Published 2026-11-20 17:53: public https://github.com/CTO-Side-com/tenant-guardian (`origin`,
+  branch `main`), homepage ctoside.com, topics agent-skills, claude-code, claude-code-plugin, cursor,
+  github-copilot, security-audit, multi-tenancy, tenant-isolation, saas, bola, row-level-security.
+- History: `af57cf4` imports v1.0.0 exactly as received (extracted ZIP dated 2026-11-20 00:13, the
+  original README restored byte for byte); `2f18599` docs; `d9ac458` marketplace rename; `6943002`
+  CI runner pin (pushed; CI run 44748481642 green). Last commit before this update: `6943002`.
+- `gh skill install CTO-Side-com/tenant-guardian tenant-guardian` from the public repo installs the
+  skill folder (checked into a scratch `--dir`); the README tests badge reads "passing".
 - Siblings in the same CTOside family: SOC 2 Engineering Guardian (v1.1, public,
   https://github.com/CTO-Side-com/soc2-engineering-guardian) and HIPAA Guardian (public). The new
   README follows the SOC 2 README's layout.
@@ -35,8 +41,8 @@ updated: 2026-11-20 17:48 +0400
   `docs/build_example.py` rebuilt the example on a scratch copy: vulnerable 2/2 `leak_observed`,
   isolated 2/2 `denied`; the rebuilt `TENANT-ISOLATION.md` matches the shipped one apart from dates
   and hashes.
-- CI (`.github/workflows/tests.yml`): ubuntu-latest, Python 3.9/3.11/3.13, unit tests and example
-  build. It has never run: there is no remote yet.
+- CI (`.github/workflows/tests.yml`): ubuntu-24.04, Python 3.9/3.11/3.13, unit tests and example
+  build; green since `6943002`.
 - Docs: README with ASCII banner, badges, five infographics (`outputs`, `workflow`, `boundary-map`,
   `evidence-model`, `probe-oracle`) and `report-preview.png`; a scratch link check resolved 38/38
   local links and anchors after the review fixes and caught both planted breaks.
@@ -64,8 +70,6 @@ updated: 2026-11-20 17:48 +0400
 - `validate` checks structure only: a `confirmed_gap` linked to one `code` item with any non-empty
   `ref` passes. By design (the CLI says "Evidence truth and scope sufficiency require review"); the
   README now says "checks evidence structure", not "validates against evidence".
-- README's tests badge and remote install commands (`/plugin marketplace add`, `gh skill install`,
-  git clone) work only once `CTO-Side-com/tenant-guardian` exists.
 - CI rebuilds the example without diffing it against `docs/example/`.
 - Fixed in TG-5: the first CI run (44748304856) failed before any test ran, because `ubuntu-latest`
   is now Ubuntu 26.04 and setup-python has no 3.9 build for it. Runner pinned to `ubuntu-24.04`, as
@@ -108,7 +112,7 @@ updated: 2026-11-20 17:48 +0400
 | TG-2 | HANDOFF.md | done | 2026-11-20 17:38 | 2026-11-20 17:38 |
 | TG-3 | Final review of README and images against the code | done | 2026-11-20 17:38 | 2026-11-20 17:47 |
 | TG-4 | Rename marketplace to `ctoside-tenant` | done | 2026-11-20 17:51 | 2026-11-20 17:55 |
-| TG-5 | Publish: git init, commits, public repo, push, CI | active | 2026-11-20 17:51 | |
+| TG-5 | Publish: git init, commits, public repo, push, CI | done | 2026-11-20 17:51 | 2026-11-20 17:58 |
 
 ## Regenerate the README preview
 
@@ -158,16 +162,13 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. Answer Needs you.
-2. If yes to git: `git init`, commit v1.0.0 as received (`chore: import tenant guardian v1.0.0`),
-   then `docs: rewrite readme with infographics and add handoff` with a `Task: TG-1` trailer.
-3. v1.0.1 hardening per Needs you, each fix with a red-then-green test; update the README lines that
-   describe today's behaviour (macOS TMPDIR note, recheck patterns, redaction list, skip list).
-4. Publish when you say "push".
+1. Answer the v1.0.1 item under Needs you.
+2. v1.0.1 hardening, each fix with a red-then-green test: narrowed symlink guard, nested-folder
+   recheck, wider redaction, `macos-latest` in CI (plus `fail-fast: false` and the v7 actions SOC 2
+   uses). Update the README lines that describe today's behaviour (macOS TMPDIR note, recheck
+   patterns, redaction list, skip list) and bump both manifests to 1.0.1.
+3. Push only when you say so.
 
 ## In flight
 
-- TG-5 publish in progress (2026-11-20 17:51). Order: `git init -b main`; commit 1 imports v1.0.0 as
-  received (original README restored for it); commit 2 the docs; commit 3 the marketplace rename;
-  `gh repo create CTO-Side-com/tenant-guardian --public`; push `main`; watch the CI run. If the
-  session ends mid-way, check `git log`, `git remote -v` and `gh run list` and carry on from there.
+- Nothing running. v1.0.0 published; working tree clean after this HANDOFF commit.
