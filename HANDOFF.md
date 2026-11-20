@@ -2,9 +2,9 @@
 status: active
 phase: v1.0.1 · Hardening (local branch v1.0.1)
 next: Merge v1.0.1 to main, push, watch CI
-tests: unit 103/103 on macOS, Python 3.13.0 and 3.9.6, default TMPDIR (2026-11-20 18:25); CI last green on v1.0.0 (82/82, run 44748481642)
+tests: unit 104/104 on macOS, Python 3.13.0 and 3.9.6, default TMPDIR (2026-11-20 18:28); CI last green on v1.0.0 (82/82, run 44748481642)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-20 18:25 +0400
+updated: 2026-11-20 18:28 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -28,8 +28,8 @@ updated: 2026-11-20 18:25 +0400
   review (TG-3) found 4 overclaims and 9 minor gaps, all applied 17:47.
 - v1.0.1 on local branch `v1.0.1` (not yet merged or pushed): `aa07683` output guard (TG-6),
   `3af727c` recheck `**` (TG-7), `7fe564c` redaction (TG-8), `1386ba1` CI (TG-9), `4fa3f0a` docs
-  and manifests (TG-10), then the TG-11 fixes `4b7bea3` and `6940508` and a docs commit. Manifests
-  read 1.0.1.
+  and manifests (TG-10), TG-11 fixes `4b7bea3`, `6940508`, `4697b2c` (docs) and `e5b6d7b`, then a
+  docs commit. Manifests read 1.0.1.
 
 ## What's working
 
@@ -41,8 +41,8 @@ updated: 2026-11-20 18:25 +0400
 - `scripts/probe.py`: two synthetic tenants, own-tenant positive controls first, then
   `leak_observed` / `denied` / `inconclusive`; dry run; `--allow-network`, `--synthetic-only` and an
   exact `--allow-origin` required; HTTPS unless loopback.
-- Tests: 103 in `skills/tenant-guardian/tests` (82 in v1.0.0), including a loopback run of both
-  fixture modes, 11 output-guard tests, 4 recheck pattern tests and 6 redaction tests (secret shapes,
+- Tests: 104 in `skills/tenant-guardian/tests` (82 in v1.0.0), including a loopback run of both
+  fixture modes, 12 output-guard tests, 4 recheck pattern tests and 6 redaction tests (secret shapes,
   ordinary text kept, no secret in any output file including PDF streams, linear time under 1 s).
   All pass on macOS under the default TMPDIR. `docs/build_example.py` rebuilt the example on a scratch
   copy with the v1.0.1 code: it differs from the shipped one in dates and port-derived hashes only.
@@ -101,6 +101,12 @@ updated: 2026-11-20 18:25 +0400
       100). New test added; the reviewer re-runs P1 against it.
     - M2 to M6: README and this file corrected (Safe writes, `/tmp` wording, joined-name redaction
       limits, folder-name watch paths).
+    - Re-check of `4697b2c`: gate 103/103 on both Pythons; P1 now fails the new alias test on its
+      own assertion (`AssertionError: ValueError not raised`); S1 closed for report and tasks.
+    - R1 (`e5b6d7b`, since v1.0.0): on macOS `report --out OUT` passed the "would replace the
+      source assessment" check (`resolve()` does not fold case) and overwrote
+      `out/assessment-redacted.json`. Now compared with `os.path.samefile`. Red: the CLI exited 0.
+      The test skips on case-sensitive filesystems; the macOS CI job runs it.
 
 ## Decisions
 
@@ -154,7 +160,7 @@ updated: 2026-11-20 18:25 +0400
 | TG-8 | Widen redaction (security-critical) | done | 2026-11-20 18:07 | 2026-11-20 18:09 |
 | TG-9 | CI: macOS job, fail-fast off, v7 actions | done | 2026-11-20 18:09 | 2026-11-20 18:10 |
 | TG-10 | README, HANDOFF, manifests 1.0.1 | done | 2026-11-20 18:10 | 2026-11-20 18:11 |
-| TG-11 | Final review of v1.0.1 (security-critical) | fix | 2026-11-20 18:12 | |
+| TG-11 | Final review of v1.0.1 (security-critical) | done | 2026-11-20 18:12 | 2026-11-20 18:28 |
 
 ## Regenerate the README preview
 
@@ -204,16 +210,10 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. TG-11: dispatch the final review of `main..v1.0.1` (general-purpose, strongest model, high
-   effort); apply its confirmed findings, one commit each.
-2. Fast-forward `main` to `v1.0.1`, list the files, push, watch CI (Ubuntu 3.9/3.11/3.13 and the
+1. Fast-forward `main` to `v1.0.1`, list the files, push, watch CI (Ubuntu 3.9/3.11/3.13 and the
    macOS job).
-3. Update this file: TG-11 done, front matter (phase v1.0.1 · Published, CI run and counts).
+2. Update this file: front matter (phase v1.0.1 · Published, CI run and counts).
 
 ## In flight
 
-- Since 2026-11-20 18:25: the TG-11 reviewer re-runs its plant P1 (`inside()` using `a.parent` instead of
-  `realpath(a.parent)`) against `6940508`, to show the new alias test fails on its own assertion,
-  and checks the S1 fix. Report appended to `$S/tg11-review.md` in the session scratchpad; if the
-  session ends first, re-run that one plant. Uncommitted: this file's TG-11 updates and the README
-  M2 to M6 fixes, which go in the next docs commit.
+- Since 2026-11-20 18:28: fast-forward `main` to `v1.0.1`, push `main`, watch CI (4 jobs). Nothing uncommitted.

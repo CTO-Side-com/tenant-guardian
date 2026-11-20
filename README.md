@@ -297,7 +297,7 @@ CSV cells that start with `=`, `+`, `-` or `@` get a leading apostrophe, so spre
 - provider key shapes: GitHub (`ghp_…`, `github_pat_…`), OpenAI (`sk-…`), Stripe (`sk_live_…`, `rk_test_…`), AWS (`AKIA…`), Slack (`xoxb-…`, `xapp-…`) and JWTs;
 - PEM and PGP private key blocks.
 
-The label has to end the name: `DB_PASSWORD=` is masked, but `SECRET_KEY=`, `JWT_SECRET_KEY=` and `PASSWORD_HASH=` are not. Anything else passes through as well, including values whose label is not in that list, a connection-URL password that contains `/` or `@`, and key shapes from other providers. Some ordinary text is masked too, such as `pwd: /srv/app`, `Token: x` or `logo@2x.png`. Each text field is also cut to 20,000 characters. Review outputs before sharing. Nothing is sent anywhere.
+The label has to end the name: `DB_PASSWORD=` is masked, but `SECRET_KEY=`, `JWT_SECRET_KEY=` and `PASSWORD_HASH=` are not. Anything else passes through as well, including values whose label is not in that list, a connection-URL password that contains `/` (all of it) or `@` (the part after the first `@`), and key shapes from other providers. Some ordinary text is masked too, such as `pwd: /srv/app`, `Token: x` or `logo@2x.png`. Each text field is also cut to 20,000 characters. Review outputs before sharing. Nothing is sent anywhere.
 
 ## Rechecks
 
@@ -347,7 +347,7 @@ docs/images/                   README infographics and report preview
 ## Development
 
 ```bash
-python3 -m unittest discover -s skills/tenant-guardian/tests -v   # 103 tests, offline plus one loopback probe run
+python3 -m unittest discover -s skills/tenant-guardian/tests -v   # 104 tests, offline plus one loopback probe run
 python3 docs/build_example.py                                     # rebuild docs/example in place (dates and hashes change)
 ```
 
