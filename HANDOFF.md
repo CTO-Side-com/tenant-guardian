@@ -4,7 +4,7 @@ phase: v1.0.1 · Published
 next: v1.0.2 candidates (Needs you)
 tests: CI 104/104 on Ubuntu 3.9/3.11/3.13 (2 case-variant tests skipped there) and macOS 3.13 (0 skipped), run 44753789907 green; local macOS 104/104 on 3.13.0 and 3.9.6 (2026-11-20)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-20 18:31 +0400
+updated: 2026-11-21 00:17 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -29,8 +29,9 @@ updated: 2026-11-20 18:31 +0400
 - v1.0.1 pushed 2026-11-20 18:31: `main` fast-forwarded from `b4ace73` to `c61a552`, CI run 44753789907 green on
   all 4 jobs. Commits: `aa07683` output guard (TG-6),
   `3af727c` recheck `**` (TG-7), `7fe564c` redaction (TG-8), `1386ba1` CI (TG-9), `4fa3f0a` docs
-  and manifests (TG-10), TG-11 fixes `4b7bea3`, `6940508`, `4697b2c` (docs) and `e5b6d7b`, then a
-  docs commit. Manifests read 1.0.1.
+  and manifests (TG-10), TG-11 fixes `4b7bea3`, `6940508`, `4697b2c` (docs) and `e5b6d7b`, then
+  `c61a552` (docs). Manifests read 1.0.1. `20da0e4` (this HANDOFF's release notes) followed; CI run
+  44754209342 green on all 4 jobs. Last commit before this update: `20da0e4`.
 
 ## What's working
 
