@@ -15,6 +15,8 @@ updated: 2026-11-20 17:48 +0400
 - Siblings in the same CTOside family: SOC 2 Engineering Guardian (v1.1, public,
   https://github.com/CTO-Side-com/soc2-engineering-guardian) and HIPAA Guardian (public). The new
   README follows the SOC 2 README's layout.
+- Marketplace renamed `ctoside` → `ctoside-tenant` (TG-4), so it no longer collides with
+  hipaa-guardian's `ctoside`; install is `/plugin install tenant-guardian@ctoside-tenant`.
 - 2026-11-20 session: README rewritten; five SVG infographics and a PDF preview added under
   `docs/images/`; this HANDOFF added. No code, manifest, test or example output changed. Final
   review (TG-3) found 4 overclaims and 9 minor gaps, all applied 17:47.
@@ -62,8 +64,6 @@ updated: 2026-11-20 17:48 +0400
 - `validate` checks structure only: a `confirmed_gap` linked to one `code` item with any non-empty
   `ref` passes. By design (the CLI says "Evidence truth and scope sufficiency require review"); the
   README now says "checks evidence structure", not "validates against evidence".
-- **Marketplace name collides.** `.claude-plugin/marketplace.json` says `ctoside`, the same as
-  hipaa-guardian's; a user can register only one marketplace per name (Needs you).
 - README's tests badge and remote install commands (`/plugin marketplace add`, `gh skill install`,
   git clone) work only once `CTO-Side-com/tenant-guardian` exists.
 - CI rebuilds the example without diffing it against `docs/example/`.
@@ -104,7 +104,7 @@ updated: 2026-11-20 17:48 +0400
 | TG-1 | README after SOC 2 Guardian: banner, badges, five infographics, preview | done | 2026-11-20 17:27 | 2026-11-20 17:38 |
 | TG-2 | HANDOFF.md | done | 2026-11-20 17:38 | 2026-11-20 17:38 |
 | TG-3 | Final review of README and images against the code | done | 2026-11-20 17:38 | 2026-11-20 17:47 |
-| TG-4 | Rename marketplace to `ctoside-tenant` | active | 2026-11-20 17:51 | |
+| TG-4 | Rename marketplace to `ctoside-tenant` | done | 2026-11-20 17:51 | 2026-11-20 17:55 |
 | TG-5 | Publish: git init, commits, public repo, push, CI | active | 2026-11-20 17:51 | |
 
 ## Regenerate the README preview

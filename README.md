@@ -76,7 +76,7 @@ The skill lives in [`skills/tenant-guardian`](skills/tenant-guardian). Pick your
 ```
 
 ```text
-/plugin install tenant-guardian@ctoside
+/plugin install tenant-guardian@ctoside-tenant
 ```
 
 **GitHub CLI** (gh 2.90 or later), for you or for one repository:
