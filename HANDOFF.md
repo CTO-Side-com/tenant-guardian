@@ -1,10 +1,10 @@
 ---
 status: active
-phase: v1.0.1 · Hardening (local branch v1.0.1)
-next: Merge v1.0.1 to main, push, watch CI
-tests: unit 104/104 on macOS, Python 3.13.0 and 3.9.6, default TMPDIR (2026-11-20 18:28); CI last green on v1.0.0 (82/82, run 44748481642)
+phase: v1.0.1 · Published
+next: v1.0.2 candidates (Needs you)
+tests: CI 104/104 on Ubuntu 3.9/3.11/3.13 (2 case-variant tests skipped there) and macOS 3.13 (0 skipped), run 44753789907 green; local macOS 104/104 on 3.13.0 and 3.9.6 (2026-11-20)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-20 18:28 +0400
+updated: 2026-11-20 18:31 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -26,7 +26,8 @@ updated: 2026-11-20 18:28 +0400
 - 2026-11-20 session: README rewritten; five SVG infographics and a PDF preview added under
   `docs/images/`; this HANDOFF added. No code, manifest, test or example output changed. Final
   review (TG-3) found 4 overclaims and 9 minor gaps, all applied 17:47.
-- v1.0.1 on local branch `v1.0.1` (not yet merged or pushed): `aa07683` output guard (TG-6),
+- v1.0.1 pushed 2026-11-20 18:31: `main` fast-forwarded from `b4ace73` to `c61a552`, CI run 44753789907 green on
+  all 4 jobs. Commits: `aa07683` output guard (TG-6),
   `3af727c` recheck `**` (TG-7), `7fe564c` redaction (TG-8), `1386ba1` CI (TG-9), `4fa3f0a` docs
   and manifests (TG-10), TG-11 fixes `4b7bea3`, `6940508`, `4697b2c` (docs) and `e5b6d7b`, then a
   docs commit. Manifests read 1.0.1.
@@ -48,7 +49,7 @@ updated: 2026-11-20 18:28 +0400
   copy with the v1.0.1 code: it differs from the shipped one in dates and port-derived hashes only.
 - CI (`.github/workflows/tests.yml`): ubuntu-24.04 × Python 3.9/3.11/3.13 plus macos-latest × 3.13,
   `fail-fast: false`, checkout/setup-python v7, unit tests and example build. Green on `main` since
-  `6943002`; the v1.0.1 workflow has not run yet.
+  `6943002`; v1.0.1 run 44753789907 green on all 4 jobs.
 - Docs: README with ASCII banner, badges, five infographics (`outputs`, `workflow`, `boundary-map`,
   `evidence-model`, `probe-oracle`) and `report-preview.png`; a scratch link check resolved 38/38
   local links and anchors after the review fixes and caught both planted breaks.
@@ -79,6 +80,9 @@ updated: 2026-11-20 18:28 +0400
   `ref` passes. By design (the CLI says "Evidence truth and scope sufficiency require review"); the
   README now says "checks evidence structure", not "validates against evidence".
 - CI rebuilds the example without diffing it against `docs/example/`.
+- **The loopback probe test is slow on the macOS runner.** `test_real_loopback_secure_and_vulnerable`
+  took 36 s of the macOS job's 37 s (run 44753789907) against ~1 s locally and on Ubuntu. Cause not
+  investigated (present since v1.0.0's test; not a v1.0.1 change).
 - Fixed in TG-5: the first CI run (44748304856) failed before any test ran, because `ubuntu-latest`
   is now Ubuntu 26.04 and setup-python has no 3.9 build for it. Runner pinned to `ubuntu-24.04`, as
   SOC 2 did.
@@ -133,6 +137,12 @@ updated: 2026-11-20 18:28 +0400
       redaction and the output guard are security-critical), then merge to `main` and push.
 
 ## Needs you
+
+- [ ] 2026-11-20 · v1.0.2: make a bare folder in `watched_paths` (`backend`, `backend/`) match the files
+      under it, so a recheck no longer fails open there? It only adds invalidations. (recommend yes)
+- [ ] 2026-11-20 · v1.0.2: prefix CSV cells that start with a bare tab or CR, as SOC 2's `csv_safe` does?
+      (recommend yes)
+- [ ] 2026-11-20 · Tag and publish a GitHub release `v1.0.1`? (recommend yes; not done unasked)
 
 - [x] 2026-11-20 · Marketplace name: rename `ctoside` to `ctoside-tenant` in both manifests and the
       README install line, as SOC 2 did with `ctoside-soc2`? (recommend rename; answered: rename)
@@ -210,10 +220,9 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## Next steps
 
-1. Fast-forward `main` to `v1.0.1`, list the files, push, watch CI (Ubuntu 3.9/3.11/3.13 and the
-   macOS job).
-2. Update this file: front matter (phase v1.0.1 · Published, CI run and counts).
+1. Wait for the Needs-you answers on the v1.0.2 candidates and the release tag.
+2. Optional: find out why the loopback probe test takes 36 s on the macOS runner.
 
 ## In flight
 
-- Since 2026-11-20 18:28: fast-forward `main` to `v1.0.1`, push `main`, watch CI (4 jobs). Nothing uncommitted.
+- Nothing. v1.0.1 is merged and pushed; local branch `v1.0.1` is fully merged into `main`.
