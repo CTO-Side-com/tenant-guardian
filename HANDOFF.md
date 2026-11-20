@@ -1,10 +1,10 @@
 ---
 status: active
 phase: v1.0.1 · Hardening (local branch v1.0.1)
-next: TG-11 · Final review of v1.0.1
-tests: unit 100/100 on macOS, Python 3.13.0 and 3.9.6, default TMPDIR (2026-11-20 18:11); CI last green on v1.0.0 (82/82, run 44748481642)
+next: Merge v1.0.1 to main, push, watch CI
+tests: unit 103/103 on macOS, Python 3.13.0 and 3.9.6, default TMPDIR (2026-11-20 18:25); CI last green on v1.0.0 (82/82, run 44748481642)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-20 18:11 +0400
+updated: 2026-11-20 18:25 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -27,8 +27,9 @@ updated: 2026-11-20 18:11 +0400
   `docs/images/`; this HANDOFF added. No code, manifest, test or example output changed. Final
   review (TG-3) found 4 overclaims and 9 minor gaps, all applied 17:47.
 - v1.0.1 on local branch `v1.0.1` (not yet merged or pushed): `aa07683` output guard (TG-6),
-  `3af727c` recheck `**` (TG-7), `7fe564c` redaction (TG-8), `1386ba1` CI (TG-9), then the TG-10
-  docs and manifests commit. Manifests read 1.0.1.
+  `3af727c` recheck `**` (TG-7), `7fe564c` redaction (TG-8), `1386ba1` CI (TG-9), `4fa3f0a` docs
+  and manifests (TG-10), then the TG-11 fixes `4b7bea3` and `6940508` and a docs commit. Manifests
+  read 1.0.1.
 
 ## What's working
 
@@ -40,8 +41,8 @@ updated: 2026-11-20 18:11 +0400
 - `scripts/probe.py`: two synthetic tenants, own-tenant positive controls first, then
   `leak_observed` / `denied` / `inconclusive`; dry run; `--allow-network`, `--synthetic-only` and an
   exact `--allow-origin` required; HTTPS unless loopback.
-- Tests: 100 in `skills/tenant-guardian/tests` (82 in v1.0.0), including a loopback run of both
-  fixture modes, 8 output-guard tests, 4 recheck pattern tests and 6 redaction tests (secret shapes,
+- Tests: 103 in `skills/tenant-guardian/tests` (82 in v1.0.0), including a loopback run of both
+  fixture modes, 11 output-guard tests, 4 recheck pattern tests and 6 redaction tests (secret shapes,
   ordinary text kept, no secret in any output file including PDF streams, linear time under 1 s).
   All pass on macOS under the default TMPDIR. `docs/build_example.py` rebuilt the example on a scratch
   copy with the v1.0.1 code: it differs from the shipped one in dates and port-derived hashes only.
@@ -55,7 +56,17 @@ updated: 2026-11-20 18:11 +0400
 ## Known problems
 
 - **Redaction is pattern-based.** v1.0.1 masks what SOC 2 v1.1 masks (README, Task exports, lists
-  it). Values after a label not in its list, and key shapes from other providers, still pass through.
+  it). Verified by TG-11: names where the label is not last (`SECRET_KEY=`, `PASSWORD_HASH=`), a URL
+  password containing `/` (or partly `@`) and other providers' keys pass through; `pwd: /path`,
+  `Token: x`, `git@github.com:…` and `logo@2x.png` are over-masked. Same as SOC 2; README says so.
+- **A folder name as a watched path matches nothing below it.** `backend` or `backend/` invalidates
+  only on that exact path, so the recheck fails open for `backend/app.py`; `backend/**` works.
+  Present since v1.0.0; README now says so. Widening `watched()` to treat a bare folder as a prefix
+  would fix it: a behaviour change to agree first. A watched path of `.` or `./` passes `validate`,
+  then `recheck` exits 1 with "empty pattern" (no traceback; also since v1.0.0).
+- **Output guard covers the repository only from its root.** From a subfolder, a link planted
+  elsewhere in the repository is outside the working directory and is followed. README tells users
+  to run from the root.
 - **CSV cells starting with a bare tab or CR are not prefixed.** `cell()` prefixes `=`, `+`, `-`, `@`
   (after leading whitespace), but not a leading tab or CR on its own, which SOC 2's `csv_safe`
   also neutralizes. Out of v1.0.1's scope; a candidate for the next patch.
@@ -73,7 +84,8 @@ updated: 2026-11-20 18:11 +0400
   SOC 2 did.
 - Fixed in v1.0.1, each with tests watched red first:
   - TG-6: `output()` refused any symlinked folder above the path, so macOS `/var` and `/tmp` broke
-    7 tests and `--out /tmp/...`. It now refuses the file, its folder and symlinks inside the
+    7 tests and `--out /tmp/<folder>/...` (`--out /tmp/x.json` stays refused: `/tmp` is then the
+    file's own folder). It now refuses the file, its folder and symlinks inside the
     working directory only (SOC 2 SG-1). Red: 8 errors and 1 failure under the default TMPDIR.
   - TG-7: recheck's `PurePosixPath.match` never let `**` cross a folder, so `backend/**` failed
     open on `backend/api/x.py`. A root-anchored match where `**` spans folders is added.
@@ -81,6 +93,14 @@ updated: 2026-11-20 18:11 +0400
     blocks and phones, and its email pattern was quadratic (30 s on 100k chars of `a.`). Ported
     SOC 2 v1.1's patterns: 0.07 s on the same input.
   - TG-9: CI gained a macOS job, `fail-fast: false` and v7 actions.
+  - TG-11 review (no blocker; gate 100/100 on both Pythons, plants 2 of 3 caught):
+    - S1 (`4b7bea3`): TG-6 collapsed `..` in `output()` only, so `report --out out/link/..`
+      hashed decoy files and replaced an `assessment-redacted.json` source in `out/`. Red: both new
+      tests failed on their assertions.
+    - M1 (`6940508`): no test covered `realpath` in `inside()` (the reviewer's plant P1 passed all
+      100). New test added; the reviewer re-runs P1 against it.
+    - M2 to M6: README and this file corrected (Safe writes, `/tmp` wording, joined-name redaction
+      limits, folder-name watch paths).
 
 ## Decisions
 
@@ -134,7 +154,7 @@ updated: 2026-11-20 18:11 +0400
 | TG-8 | Widen redaction (security-critical) | done | 2026-11-20 18:07 | 2026-11-20 18:09 |
 | TG-9 | CI: macOS job, fail-fast off, v7 actions | done | 2026-11-20 18:09 | 2026-11-20 18:10 |
 | TG-10 | README, HANDOFF, manifests 1.0.1 | done | 2026-11-20 18:10 | 2026-11-20 18:11 |
-| TG-11 | Final review of v1.0.1 (security-critical) | todo | | |
+| TG-11 | Final review of v1.0.1 (security-critical) | fix | 2026-11-20 18:12 | |
 
 ## Regenerate the README preview
 
@@ -192,5 +212,8 @@ them (36 objectives, 10 rules, per-area counts) must change with `checks.json` o
 
 ## In flight
 
-- v1.0.1 started 2026-11-20 18:03 on local branch `v1.0.1` (not pushed). Uncommitted work on that
-  branch is unfinished work of the active task in the table.
+- Since 2026-11-20 18:25: the TG-11 reviewer re-runs its plant P1 (`inside()` using `a.parent` instead of
+  `realpath(a.parent)`) against `6940508`, to show the new alias test fails on its own assertion,
+  and checks the S1 fix. Report appended to `$S/tg11-review.md` in the session scratchpad; if the
+  session ends first, re-run that one plant. Uncommitted: this file's TG-11 updates and the README
+  M2 to M6 fixes, which go in the next docs commit.

@@ -297,7 +297,7 @@ CSV cells that start with `=`, `+`, `-` or `@` get a leading apostrophe, so spre
 - provider key shapes: GitHub (`ghp_…`, `github_pat_…`), OpenAI (`sk-…`), Stripe (`sk_live_…`, `rk_test_…`), AWS (`AKIA…`), Slack (`xoxb-…`, `xapp-…`) and JWTs;
 - PEM and PGP private key blocks.
 
-Anything else passes through, including values whose label is not in that list and key shapes from other providers. Each text field is also cut to 20,000 characters. Review outputs before sharing. Nothing is sent anywhere.
+The label has to end the name: `DB_PASSWORD=` is masked, but `SECRET_KEY=`, `JWT_SECRET_KEY=` and `PASSWORD_HASH=` are not. Anything else passes through as well, including values whose label is not in that list, a connection-URL password that contains `/` or `@`, and key shapes from other providers. Some ordinary text is masked too, such as `pwd: /srv/app`, `Token: x` or `logo@2x.png`. Each text field is also cut to 20,000 characters. Review outputs before sharing. Nothing is sent anywhere.
 
 ## Rechecks
 
@@ -307,7 +307,7 @@ After engineering changes, list the changed files (repository-relative, one per 
 python3 "$SKILL_DIR/scripts/guardian.py" recheck --assessment tenant-output/assessment.json --changed-files changed-files.txt --out tenant-output/assessment-recheck.json
 ```
 
-The result is a new assessment. Each affected objective drops to `insufficient_evidence`, keeps its `prior_status` and `stale_evidence` as history, and loses its verified scope. An objective with no `watched_paths` is invalidated conservatively by any change. A watch pattern matches a changed path if it matches from the repository root, where `*` stays within one folder and `**` spans any number of folders (`backend/**` matches `backend/api/app.py`; `**/migrations/*.sql` matches `migrations/001.sql` and `db/migrations/001.sql`). It also matches if it matches the end of the path, as Python's `PurePosixPath.match` does, so `*.sql` matches `db/schema.sql`. Cloud drift, changed memberships, runtime settings and changed data ownership need a separate review.
+The result is a new assessment. Each affected objective drops to `insufficient_evidence`, keeps its `prior_status` and `stale_evidence` as history, and loses its verified scope. An objective with no `watched_paths` is invalidated conservatively by any change. A watch pattern matches a changed path if it matches from the repository root, where `*` stays within one folder and `**` spans any number of folders (`backend/**` matches `backend/api/app.py`; `**/migrations/*.sql` matches `migrations/001.sql` and `db/migrations/001.sql`). It also matches if it matches the end of the path, as Python's `PurePosixPath.match` does, so `*.sql` matches `db/schema.sql`. A folder name on its own (`backend` or `backend/`) matches only that path, not the files under it: write `backend/**`. Cloud drift, changed memberships, runtime settings and changed data ownership need a separate review.
 
 ## Safety model
 
@@ -315,7 +315,7 @@ The result is a new assessment. Each affected objective drops to `insufficient_e
 - **Evidence is data, never instructions.** Source files, comments, READMEs, query results, fixture text and API responses are untrusted input, and instructions found inside them are not followed.
 - **No secrets or customer records.** The agent is instructed never to open `.env` files, private keys, raw credentials, customer records or database dumps. The scanner itself skips `.env*`, five named credential files and the folders listed under [Offline scanner](#offline-scanner); other files it reads are pattern-matched, and only file and line are recorded.
 - **No network unless you opt in.** Every script uses the Python standard library. The only script that sends requests is `probe.py`, which needs `--allow-network`, `--synthetic-only` and an `--allow-origin` that exactly matches the plan, and sends GET requests only. The bundled demo server listens on `127.0.0.1` only.
-- **Safe writes.** An output path is refused if the file or its folder is a symlink, or if any folder above it inside the working directory is one, so a link planted in the repository cannot redirect a report. Symlinks above the working directory, such as `/tmp` and `/var` on macOS, are allowed. `report` and `tasks` refuse an output folder that would replace the source assessment, and reject structurally invalid assessments.
+- **Safe writes.** An output path is refused if the file or its folder is a symlink, or if any folder on the path that lies inside the working directory is one. Run the commands from the repository root so that this covers the whole repository: from a subfolder, a link planted elsewhere in the repository is outside the working directory and is followed. Symlinks outside the working directory, such as `/tmp` and `/var` on macOS, are allowed unless they are the output file or its own folder, so write to `/tmp/<folder>/report.json`, not `/tmp/report.json`. `report` and `tasks` refuse an output folder that would replace the source assessment, and reject structurally invalid assessments.
 - **Pattern-based redaction.** The shapes listed under [Task exports](#task-exports-jira-notion-slack) are masked in every report and export before anything is written. It is a safety net, not a substitute for a human check.
 - **No green lights.** No isolation guarantees, no scores, no percentages and no certificates. Counts describe reviewed evidence states.
 
@@ -347,7 +347,7 @@ docs/images/                   README infographics and report preview
 ## Development
 
 ```bash
-python3 -m unittest discover -s skills/tenant-guardian/tests -v   # 100 tests, offline plus one loopback probe run
+python3 -m unittest discover -s skills/tenant-guardian/tests -v   # 103 tests, offline plus one loopback probe run
 python3 docs/build_example.py                                     # rebuild docs/example in place (dates and hashes change)
 ```
 
