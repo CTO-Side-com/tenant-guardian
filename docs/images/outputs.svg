@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 512" width="960" height="512" role="img" aria-labelledby="t d">
+  <title id="t">What goes in and what comes out</title>
+  <desc id="d">Inputs: source code and configuration, offline scanner leads, opt-in synthetic GET probe results, reviewed evidence, and the declared scope and isolation architecture. Tenant Guardian builds assessment.json covering 36 objectives. Outputs: a PDF and Markdown report, a risk register and a regression test plan; a redacted assessment and a hashed handoff manifest; and Jira, Notion, Slack Lists, Slack message and Markdown checklist task files.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#101827"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+      .h { font-size: 22px; font-weight: 700; fill: #101827; }
+      .s { font-size: 13px; fill: #52514e; }
+      .k { font-size: 11px; font-weight: 700; fill: #8a8984; letter-spacing: 0.06em; }
+      .it { font-size: 13.5px; font-weight: 600; fill: #0b0b0b; }
+      .f { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; fill: #0b0b0b; }
+      .fd { font-size: 11.5px; fill: #52514e; }
+      .card { fill: #ffffff; stroke: #e1e0d9; }
+      .ar { stroke: #101827; stroke-width: 1.6; fill: none; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="511" rx="16" fill="#fcfcfb" stroke="#e1e0d9"/>
+  <rect x="36" y="26" width="56" height="3" fill="#39B9D0"/>
+  <text class="h" x="36" y="56">What goes in, what comes out</text>
+  <text class="s" x="36" y="80">Everything stays local. Nothing is uploaded; outputs are redacted by pattern and still need a human check.</text>
+
+  <rect class="card" x="36" y="96" width="212" height="388" rx="12"/>
+  <text class="k" x="56" y="124">INPUTS</text>
+  <text class="it" x="56" y="166">Source and configuration</text>
+  <text class="fd" x="56" y="185">Read-only; .env and</text>
+  <text class="fd" x="56" y="201">credential files skipped</text>
+  <text class="it" x="56" y="230">Offline scanner leads</text>
+  <text class="fd" x="56" y="249">10 rules, file and line only,</text>
+  <text class="fd" x="56" y="265">never the matching text</text>
+  <text class="it" x="56" y="294">Synthetic GET probes</text>
+  <text class="fd" x="56" y="313">Opt-in, two test tenants;</text>
+  <text class="fd" x="56" y="329">labels, statuses and hashes</text>
+  <text class="it" x="56" y="358">Reviewed evidence</text>
+  <text class="fd" x="56" y="377">Code, configuration, tests,</text>
+  <text class="fd" x="56" y="393">operations and architecture</text>
+  <text class="it" x="56" y="422">Scope and architecture</text>
+  <text class="fd" x="56" y="441">Systems, exclusions and</text>
+  <text class="fd" x="56" y="457">the isolation model in use</text>
+
+  <path class="ar" d="M252 290H290" marker-end="url(#a)"/>
+
+  <rect x="296" y="200" width="204" height="180" rx="14" fill="#101827"/>
+  <text x="316" y="234" font-size="11" font-weight="700" fill="#39B9D0" letter-spacing="0.06em">TENANT GUARDIAN</text>
+  <text x="316" y="264" font-size="17" font-weight="700" fill="#ffffff">assessment.json</text>
+  <text x="316" y="292" font-size="12" fill="#d5dce8">36 objectives, each with</text>
+  <text x="316" y="310" font-size="12" fill="#d5dce8">a status, reviewer, dated</text>
+  <text x="316" y="328" font-size="12" fill="#d5dce8">evidence, verified scope</text>
+  <text x="316" y="346" font-size="12" fill="#d5dce8">and a remediation</text>
+
+  <path class="ar" d="M504 290H518V160H530" marker-end="url(#a)"/>
+  <path class="ar" d="M518 290V280H530" marker-end="url(#a)"/>
+  <path class="ar" d="M518 290V410H530" marker-end="url(#a)"/>
+
+  <rect class="card" x="536" y="96" width="388" height="128" rx="12"/>
+  <text class="k" x="556" y="120">REPORTS</text>
+  <text class="f" x="556" y="144">TENANT-ISOLATION.pdf</text><text class="fd" x="752" y="144">paginated report</text>
+  <text class="f" x="556" y="164">TENANT-ISOLATION.md</text><text class="fd" x="752" y="164">Markdown version</text>
+  <text class="f" x="556" y="184">risk-register.csv</text><text class="fd" x="752" y="184">every open objective</text>
+  <text class="f" x="556" y="204">TEST-PLAN.md</text><text class="fd" x="752" y="204">regression prompts</text>
+  <rect class="card" x="536" y="236" width="388" height="88" rx="12"/>
+  <text class="k" x="556" y="260">HANDOFF</text>
+  <text class="f" x="556" y="284">assessment-redacted.json</text><text class="fd" x="752" y="284">redacted for sharing</text>
+  <text class="f" x="556" y="304">handoff-manifest.json</text><text class="fd" x="752" y="304">SHA-256 per file</text>
+  <rect class="card" x="536" y="336" width="388" height="148" rx="12"/>
+  <text class="k" x="556" y="360">TASKS</text>
+  <text class="f" x="556" y="384">tasks-jira.csv</text><text class="fd" x="752" y="384">Jira CSV import</text>
+  <text class="f" x="556" y="404">tasks-notion.csv</text><text class="fd" x="752" y="404">Notion database</text>
+  <text class="f" x="556" y="424">tasks-slack-list.csv</text><text class="fd" x="752" y="424">Slack Lists import</text>
+  <text class="f" x="556" y="444">tasks-slack.txt</text><text class="fd" x="752" y="444">Slack message</text>
+  <text class="f" x="556" y="464">tasks.md</text><text class="fd" x="752" y="464">Markdown checklist</text>
+</svg>

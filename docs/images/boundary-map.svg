@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 660" width="960" height="660" role="img" aria-labelledby="t d">
+  <title id="t">Where tenant context has to hold: 36 objectives in eight areas</title>
+  <desc id="d">Tenant context, 5 objectives: an authenticated principal and a verified membership produce the trusted tenant context; client selectors are not authority. It flows into API and authorization, 6 objectives, and from there into five stores: database 6, caches 4, object storage 4, jobs and webhooks 4, and AI retrieval 4. Lifecycle and audit, 3 objectives, spans all of them.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#101827"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+      .h { font-size: 22px; font-weight: 700; fill: #101827; }
+      .s { font-size: 13px; fill: #52514e; }
+      .k { font-size: 11px; font-weight: 700; fill: #8a8984; letter-spacing: 0.06em; }
+      .ct { font-size: 14.5px; font-weight: 700; fill: #0b0b0b; }
+      .cd { font-size: 12.5px; fill: #52514e; }
+      .b { font-size: 11.5px; fill: #3a3936; }
+      .p { font-size: 13px; font-weight: 600; fill: #0b0b0b; text-anchor: middle; }
+      .pw { font-size: 13px; font-weight: 600; fill: #ffffff; text-anchor: middle; }
+      .chip { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
+      .card { fill: #ffffff; stroke: #e1e0d9; }
+      .pill { fill: #f4f3ef; stroke: #e1e0d9; }
+      .dot { fill: #39B9D0; }
+      .ar { stroke: #101827; stroke-width: 1.6; fill: none; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="659" rx="16" fill="#fcfcfb" stroke="#e1e0d9"/>
+  <rect x="36" y="26" width="56" height="3" fill="#39B9D0"/>
+  <text class="h" x="36" y="56">Where tenant context has to hold</text>
+  <text class="s" x="36" y="80">36 original objectives in references/checks.json, grouped by the boundary each one tests.</text>
+
+  <!-- Tenant context -->
+  <rect class="card" x="36" y="100" width="888" height="136" rx="12"/>
+  <text class="k" x="56" y="125">TENANT CONTEXT</text>
+  <rect x="836" y="111" width="72" height="20" rx="10" fill="#101827"/><text class="chip" x="872" y="125">CTX · 5</text>
+  <rect class="pill" x="56" y="140" width="240" height="36" rx="18"/><text class="p" x="176" y="163">Authenticated principal</text>
+  <path class="ar" d="M300 158H330" marker-end="url(#a)"/>
+  <rect class="pill" x="336" y="140" width="240" height="36" rx="18"/><text class="p" x="456" y="163">Verified membership</text>
+  <path class="ar" d="M580 158H610" marker-end="url(#a)"/>
+  <rect x="616" y="140" width="240" height="36" rx="18" fill="#101827"/><text class="pw" x="736" y="163">Trusted tenant context</text>
+  <text class="cd" x="56" y="202">Header, path and queue tenant IDs are selectors, never authority. A tenant admin is not a platform admin.</text>
+  <text class="cd" x="56" y="220">Request and thread context stays isolated; switching tenants and revoked membership are re-checked.</text>
+
+  <path class="ar" d="M480 236V260" marker-end="url(#a)"/>
+
+  <!-- API -->
+  <rect class="card" x="36" y="266" width="888" height="80" rx="12"/>
+  <text class="k" x="56" y="291">API AND AUTHORIZATION</text>
+  <rect x="836" y="277" width="72" height="20" rx="10" fill="#101827"/><text class="chip" x="872" y="291">API · 6</text>
+  <text class="cd" x="56" y="322">Reads, writes, lists, search and counts, nested and bulk IDs, exports, downloads and websocket events each check the tenant.</text>
+
+  <path class="ar" d="M480 346V362"/>
+  <path class="ar" d="M120 362H840"/>
+  <path class="ar" d="M120 362V378" marker-end="url(#a)"/>
+  <path class="ar" d="M300 362V378" marker-end="url(#a)"/>
+  <path class="ar" d="M480 362V378" marker-end="url(#a)"/>
+  <path class="ar" d="M660 362V378" marker-end="url(#a)"/>
+  <path class="ar" d="M840 362V378" marker-end="url(#a)"/>
+
+  <!-- Five stores -->
+  <g>
+    <rect class="card" x="36" y="384" width="168" height="170" rx="12"/>
+    <text class="ct" x="52" y="412">Database</text>
+    <rect x="52" y="424" width="64" height="20" rx="10" fill="#101827"/><text class="chip" x="84" y="438">DB · 6</text>
+    <circle class="dot" cx="56" cy="464" r="2.5"/><text class="b" x="64" y="468">Isolation model</text>
+    <circle class="dot" cx="56" cy="482" r="2.5"/><text class="b" x="64" y="486">Raw SQL and joins</text>
+    <circle class="dot" cx="56" cy="500" r="2.5"/><text class="b" x="64" y="504">RLS, bypass roles</text>
+    <circle class="dot" cx="56" cy="518" r="2.5"/><text class="b" x="64" y="522">Pooled connections</text>
+    <circle class="dot" cx="56" cy="536" r="2.5"/><text class="b" x="64" y="540">Views, migrations</text>
+  </g>
+  <g>
+    <rect class="card" x="216" y="384" width="168" height="170" rx="12"/>
+    <text class="ct" x="232" y="412">Caches</text>
+    <rect x="232" y="424" width="84" height="20" rx="10" fill="#101827"/><text class="chip" x="274" y="438">CACHE · 4</text>
+    <circle class="dot" cx="236" cy="464" r="2.5"/><text class="b" x="244" y="468">Tenant-scoped keys</text>
+    <circle class="dot" cx="236" cy="482" r="2.5"/><text class="b" x="244" y="486">Auth memoization</text>
+    <circle class="dot" cx="236" cy="500" r="2.5"/><text class="b" x="244" y="504">Invalidation</text>
+    <circle class="dot" cx="236" cy="518" r="2.5"/><text class="b" x="244" y="522">CDN and responses</text>
+  </g>
+  <g>
+    <rect class="card" x="396" y="384" width="168" height="170" rx="12"/>
+    <text class="ct" x="412" y="412">Object storage</text>
+    <rect x="412" y="424" width="84" height="20" rx="10" fill="#101827"/><text class="chip" x="454" y="438">STORE · 4</text>
+    <circle class="dot" cx="416" cy="464" r="2.5"/><text class="b" x="424" y="468">Ownership, not prefix</text>
+    <circle class="dot" cx="416" cy="482" r="2.5"/><text class="b" x="424" y="486">Signed links</text>
+    <circle class="dot" cx="416" cy="500" r="2.5"/><text class="b" x="424" y="504">Path and prefix edges</text>
+    <circle class="dot" cx="416" cy="518" r="2.5"/><text class="b" x="424" y="522">Versions, deletion</text>
+  </g>
+  <g>
+    <rect class="card" x="576" y="384" width="168" height="170" rx="12"/>
+    <text class="ct" x="592" y="412">Jobs, webhooks</text>
+    <rect x="592" y="424" width="72" height="20" rx="10" fill="#101827"/><text class="chip" x="628" y="438">JOB · 4</text>
+    <circle class="dot" cx="596" cy="464" r="2.5"/><text class="b" x="604" y="468">Queued tenant context</text>
+    <circle class="dot" cx="596" cy="482" r="2.5"/><text class="b" x="604" y="486">Retries, dead letters</text>
+    <circle class="dot" cx="596" cy="500" r="2.5"/><text class="b" x="604" y="504">Webhook credentials</text>
+    <circle class="dot" cx="596" cy="518" r="2.5"/><text class="b" x="604" y="522">Shared capacity</text>
+  </g>
+  <g>
+    <rect class="card" x="756" y="384" width="168" height="170" rx="12"/>
+    <text class="ct" x="772" y="412">AI retrieval</text>
+    <rect x="772" y="424" width="64" height="20" rx="10" fill="#101827"/><text class="chip" x="804" y="438">AI · 4</text>
+    <circle class="dot" cx="776" cy="464" r="2.5"/><text class="b" x="784" y="468">Vector and search</text>
+    <circle class="dot" cx="776" cy="482" r="2.5"/><text class="b" x="784" y="486">Chat memory, caches</text>
+    <circle class="dot" cx="776" cy="500" r="2.5"/><text class="b" x="784" y="504">Tool authorization</text>
+    <circle class="dot" cx="776" cy="518" r="2.5"/><text class="b" x="784" y="522">Traces, datasets</text>
+  </g>
+
+  <!-- Lifecycle spans everything -->
+  <rect x="36" y="572" width="888" height="64" rx="12" fill="#e9edf3"/>
+  <text class="k" x="56" y="596" style="fill:#52514e">LIFECYCLE AND AUDIT, ACROSS ALL OF THE ABOVE</text>
+  <rect x="826" y="583" width="82" height="20" rx="10" fill="#101827"/><text class="chip" x="867" y="597">LIFE · 3</text>
+  <text class="cd" x="56" y="620" style="fill:#0b0b0b">Provisioning and failed setup, tenant deletion, backup restore, support access, audit feeds and cross-tenant administration.</text>
+</svg>

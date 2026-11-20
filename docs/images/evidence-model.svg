@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" width="960" height="520" role="img" aria-labelledby="t d">
+  <title id="t">The evidence model: five conclusions and what each one needs</title>
+  <desc id="d">Every objective ends in one of five conclusions. Confirmed gap: a substantiated code path or an observed leak; needs a reviewer, rationale and evidence, where test evidence counts only if it observed a leak, plus severity, owner, recommendation and a done-when test. Suspected gap: a documented lead; needs a reviewer, rationale, evidence, severity, owner, recommendation and a done-when test. Verified in scope: a reviewed runtime denial; needs a reviewer, a rationale, runtime test evidence with positive controls in which every linked test was denied, and an explicit verified scope. Not applicable: needs a reviewer, a rationale and a named human approver. Insufficient evidence is the default and needs nothing.</desc>
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+      .h { font-size: 22px; font-weight: 700; fill: #101827; }
+      .s { font-size: 13px; fill: #52514e; }
+      .k { font-size: 11px; font-weight: 700; fill: #8a8984; letter-spacing: 0.06em; }
+      .st { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; font-weight: 700; fill: #101827; }
+      .m { font-size: 13px; fill: #0b0b0b; }
+      .n { font-size: 12.5px; fill: #52514e; }
+      .code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; fill: #101827; }
+      .card { fill: #ffffff; stroke: #e1e0d9; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="519" rx="16" fill="#fcfcfb" stroke="#e1e0d9"/>
+  <rect x="36" y="26" width="56" height="3" fill="#39B9D0"/>
+  <text class="h" x="36" y="56">Five conclusions, never a green light</text>
+  <text class="s" x="36" y="80">No gap or verification is set automatically. guardian.py validate refuses any whose recorded evidence breaks these rules.</text>
+
+  <text class="k" x="56" y="112">CONCLUSION</text>
+  <text class="k" x="272" y="112">MEANS</text>
+  <text class="k" x="552" y="112">NEEDS BEFORE VALIDATE ACCEPTS IT</text>
+
+  <g>
+    <rect class="card" x="36" y="124" width="888" height="62" rx="10"/>
+    <rect x="56" y="143" width="10" height="10" rx="2" fill="#d03b3b"/>
+    <text class="st" x="76" y="153">confirmed_gap</text>
+    <text class="m" x="272" y="150">A substantiated code path</text>
+    <text class="m" x="272" y="168">or an observed leak</text>
+    <text class="n" x="552" y="150">Reviewer, rationale, evidence; a test counts only</text>
+    <text class="n" x="552" y="168">if it saw a leak. Severity, owner, fix, retest.</text>
+  </g>
+  <g>
+    <rect class="card" x="36" y="196" width="888" height="62" rx="10"/>
+    <rect x="56" y="215" width="10" height="10" rx="2" fill="#fab219"/>
+    <text class="st" x="76" y="225">suspected_gap</text>
+    <text class="m" x="272" y="222">A documented lead that</text>
+    <text class="m" x="272" y="240">still needs tracing</text>
+    <text class="n" x="552" y="222">Reviewer, rationale, evidence.</text>
+    <text class="n" x="552" y="240">Severity, owner, fix, retest.</text>
+  </g>
+  <g>
+    <rect class="card" x="36" y="268" width="888" height="62" rx="10"/>
+    <rect x="56" y="287" width="10" height="10" rx="2" fill="#0ca30c"/>
+    <text class="st" x="76" y="297">verified_in_scope</text>
+    <text class="m" x="272" y="294">A reviewed runtime denial,</text>
+    <text class="m" x="272" y="312">for one exact scope</text>
+    <text class="n" x="552" y="294">Reviewer, rationale; runtime tests with positive</text>
+    <text class="n" x="552" y="312">controls, every one denied; explicit verified_scope.</text>
+  </g>
+  <g>
+    <rect class="card" x="36" y="340" width="888" height="62" rx="10"/>
+    <rect x="56" y="359" width="10" height="10" rx="2" fill="#e1e0d9" stroke="#a8a79f"/>
+    <text class="st" x="76" y="369">not_applicable</text>
+    <text class="m" x="272" y="366">Does not apply to this</text>
+    <text class="m" x="272" y="384">isolation architecture</text>
+    <text class="n" x="552" y="366">Reviewer and rationale.</text>
+    <text class="n" x="552" y="384">A named human approver.</text>
+  </g>
+  <g>
+    <rect class="card" x="36" y="412" width="888" height="62" rx="10"/>
+    <rect x="56" y="431" width="10" height="10" rx="2" fill="#a8a79f"/>
+    <text class="st" x="76" y="441">insufficient_evidence</text>
+    <text class="m" x="272" y="438">No supported conclusion</text>
+    <text class="m" x="272" y="456">yet: the default</text>
+    <text class="n" x="552" y="438">Nothing. Inaccessible systems stay here,</text>
+    <text class="n" x="552" y="456">and become evidence requests in the tasks.</text>
+  </g>
+  <text class="s" x="36" y="500">A denied GET verifies that GET only. A scanner hit is a lead. An inaccessible API is not a vulnerability.</text>
+</svg>

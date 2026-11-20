@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 584" width="960" height="584" role="img" aria-labelledby="t d">
+  <title id="t">How a Tenant Guardian assessment runs</title>
+  <desc id="d">Nine steps: scope the assessment, map tenant context, scan the repository offline, generate the regression plan, optionally probe synthetic GET paths, record evidence and conclusions, validate, render the report and task files, then recheck after changes in a loop that gathers fresh evidence for the affected objectives.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#101827"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+      .h { font-size: 22px; font-weight: 700; fill: #101827; }
+      .s { font-size: 13px; fill: #52514e; }
+      .ct { font-size: 15.5px; font-weight: 700; fill: #0b0b0b; }
+      .cd { font-size: 12.5px; fill: #52514e; }
+      .n { font-size: 13px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
+      .opt { font-size: 11px; font-weight: 700; fill: #39B9D0; letter-spacing: 0.06em; }
+      .card { fill: #ffffff; stroke: #e1e0d9; }
+      .hl { fill: #ffffff; stroke: #101827; stroke-width: 1.5; }
+      .ar { stroke: #101827; stroke-width: 1.6; fill: none; }
+      .loop { font-size: 12.5px; fill: #101827; text-anchor: middle; font-weight: 600; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="583" rx="16" fill="#fcfcfb" stroke="#e1e0d9"/>
+  <rect x="36" y="26" width="56" height="3" fill="#39B9D0"/>
+  <text class="h" x="36" y="56">How an assessment runs</text>
+  <text class="s" x="36" y="80">Read-only by default. Every conclusion carries evidence a person can re-check.</text>
+
+  <g>
+    <rect class="card" x="36" y="104" width="276" height="112" rx="12"/>
+    <circle cx="66" cy="136" r="14" fill="#101827"/><text class="n" x="66" y="140.5">1</text>
+    <text class="ct" x="90" y="141">Scope</text>
+    <text class="cd" x="56" y="176">Product, environment, approval</text>
+    <text class="cd" x="56" y="196">Tenants, members, global data</text>
+  </g>
+  <g>
+    <rect class="card" x="342" y="104" width="276" height="112" rx="12"/>
+    <circle cx="372" cy="136" r="14" fill="#101827"/><text class="n" x="372" y="140.5">2</text>
+    <text class="ct" x="396" y="141">Map tenant context</text>
+    <text class="cd" x="362" y="176">Principal, membership, then API,</text>
+    <text class="cd" x="362" y="196">stores, queues, storage and AI</text>
+  </g>
+  <g>
+    <rect class="card" x="648" y="104" width="276" height="112" rx="12"/>
+    <circle cx="678" cy="136" r="14" fill="#101827"/><text class="n" x="678" y="140.5">3</text>
+    <text class="ct" x="702" y="141">Scan</text>
+    <text class="cd" x="668" y="176">10 offline rules, file and line</text>
+    <text class="cd" x="668" y="196">Leads only, never a verdict</text>
+  </g>
+  <g>
+    <rect class="card" x="36" y="256" width="276" height="112" rx="12"/>
+    <circle cx="66" cy="288" r="14" fill="#101827"/><text class="n" x="66" y="292.5">4</text>
+    <text class="ct" x="90" y="293">Plan</text>
+    <text class="cd" x="56" y="328">36 regression prompts with</text>
+    <text class="cd" x="56" y="348">scope and architecture notes</text>
+  </g>
+  <g>
+    <rect class="card" x="342" y="256" width="276" height="112" rx="12"/>
+    <circle cx="372" cy="288" r="14" fill="#101827"/><text class="n" x="372" y="292.5">5</text>
+    <text class="ct" x="396" y="293">Probe</text><text class="opt" x="448" y="292">OPTIONAL</text>
+    <text class="cd" x="362" y="328">Two synthetic tenants, GET only,</text>
+    <text class="cd" x="362" y="348">after an explicit opt-in</text>
+  </g>
+  <g>
+    <rect class="card" x="648" y="256" width="276" height="112" rx="12"/>
+    <circle cx="678" cy="288" r="14" fill="#101827"/><text class="n" x="678" y="292.5">6</text>
+    <text class="ct" x="702" y="293">Record evidence</text>
+    <text class="cd" x="668" y="328">Dated, scoped, named reviewer;</text>
+    <text class="cd" x="668" y="348">one of five conclusions</text>
+  </g>
+  <g>
+    <rect class="card" x="36" y="408" width="276" height="112" rx="12"/>
+    <circle cx="66" cy="440" r="14" fill="#101827"/><text class="n" x="66" y="444.5">7</text>
+    <text class="ct" x="90" y="445">Validate</text>
+    <text class="cd" x="56" y="480">guardian.py validate rejects</text>
+    <text class="cd" x="56" y="500">conclusions that break the rules</text>
+  </g>
+  <g>
+    <rect class="hl" x="342" y="408" width="276" height="112" rx="12"/>
+    <circle cx="372" cy="440" r="14" fill="#101827"/><text class="n" x="372" y="444.5">8</text>
+    <text class="ct" x="396" y="445">Report and tasks</text>
+    <text class="cd" x="362" y="480">PDF, Markdown, risk register,</text>
+    <text class="cd" x="362" y="500">Jira, Notion, Slack tasks</text>
+  </g>
+  <g>
+    <rect class="card" x="648" y="408" width="276" height="112" rx="12"/>
+    <circle cx="678" cy="440" r="14" fill="#101827"/><text class="n" x="678" y="444.5">9</text>
+    <text class="ct" x="702" y="445">Recheck</text>
+    <text class="cd" x="668" y="480">Changed files invalidate the</text>
+    <text class="cd" x="668" y="500">affected conclusions</text>
+  </g>
+
+  <path class="ar" d="M316 160H336" marker-end="url(#a)"/>
+  <path class="ar" d="M622 160H642" marker-end="url(#a)"/>
+  <path class="ar" d="M316 312H336" marker-end="url(#a)"/>
+  <path class="ar" d="M622 312H642" marker-end="url(#a)"/>
+  <path class="ar" d="M316 464H336" marker-end="url(#a)"/>
+  <path class="ar" d="M622 464H642" marker-end="url(#a)"/>
+  <path class="ar" d="M786 220V238H174V250" marker-end="url(#a)"/>
+  <path class="ar" d="M786 372V390H174V402" marker-end="url(#a)"/>
+  <path class="ar" d="M786 524V544H18V312H30" stroke-dasharray="5 5" marker-end="url(#a)"/>
+  <text class="loop" x="480" y="568">recheck loop: re-verify the affected objectives after every approved change</text>
+</svg>

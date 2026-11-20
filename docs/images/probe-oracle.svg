@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 626" width="960" height="626" role="img" aria-labelledby="t d">
+  <title id="t">How a synthetic GET probe reaches a result</title>
+  <desc id="d">Step 1, dry run: the plan is validated without reading credentials or sending requests. Step 2, opt-in gate: allow-network, synthetic-only and an exact allow-origin are required, and HTTPS unless the origin is loopback. Step 3, positive controls: each tenant reads its own resources and must get a 200 with its own marker, no foreign marker and a complete body. If any control fails, cross-tenant requests are skipped and reported as inconclusive; a foreign marker seen in an own-tenant control is still reported as leak_observed. Step 4, cross-tenant GET: each tenant requests the other tenant's resource. A foreign marker gives leak_observed whatever the status; a clean, complete 403 or 404 gives denied for that GET only; 401, redirects, server errors, empty 200s, timeouts and truncated bodies are inconclusive. Saved: labels, status codes, marker flags and SHA-256 hashes. Never saved: tokens, bodies, marker strings or request paths.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10z" fill="#101827"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+      .h { font-size: 22px; font-weight: 700; fill: #101827; }
+      .s { font-size: 13px; fill: #52514e; }
+      .ct { font-size: 15.5px; font-weight: 700; fill: #0b0b0b; }
+      .cd { font-size: 12.5px; fill: #52514e; }
+      .f { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11.5px; fill: #101827; }
+      .st { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 14px; font-weight: 700; fill: #101827; }
+      .n { font-size: 13px; font-weight: 700; fill: #ffffff; text-anchor: middle; }
+      .lab { font-size: 11.5px; font-weight: 600; fill: #101827; }
+      .card { fill: #ffffff; stroke: #e1e0d9; }
+      .skip { fill: #f4f3ef; stroke: #a8a79f; stroke-dasharray: 5 4; }
+      .ar { stroke: #101827; stroke-width: 1.6; fill: none; }
+    </style>
+  </defs>
+  <rect x="0.5" y="0.5" width="959" height="625" rx="16" fill="#fcfcfb" stroke="#e1e0d9"/>
+  <rect x="36" y="26" width="56" height="3" fill="#39B9D0"/>
+  <text class="h" x="36" y="56">How a probe reaches a result</text>
+  <text class="s" x="36" y="80">Two synthetic tenants, known resources, seeded markers. The runner creates nothing and changes no conclusion.</text>
+
+  <g>
+    <rect class="card" x="36" y="104" width="276" height="120" rx="12"/>
+    <circle cx="66" cy="136" r="14" fill="#101827"/><text class="n" x="66" y="140.5">1</text>
+    <text class="ct" x="90" y="141">Dry run</text>
+    <text class="cd" x="56" y="176">Validates the plan; reads no</text>
+    <text class="cd" x="56" y="196">credentials, sends no requests</text>
+  </g>
+  <g>
+    <rect class="card" x="342" y="104" width="276" height="120" rx="12"/>
+    <circle cx="372" cy="136" r="14" fill="#101827"/><text class="n" x="372" y="140.5">2</text>
+    <text class="ct" x="396" y="141">Opt-in gate</text>
+    <text class="f" x="362" y="172">--allow-network --synthetic-only</text>
+    <text class="cd" x="362" y="192">and an exact --allow-origin;</text>
+    <text class="cd" x="362" y="210">HTTPS unless the origin is loopback</text>
+  </g>
+  <g>
+    <rect class="card" x="648" y="104" width="276" height="120" rx="12"/>
+    <circle cx="678" cy="136" r="14" fill="#101827"/><text class="n" x="678" y="140.5">3</text>
+    <text class="ct" x="702" y="141">Positive controls</text>
+    <text class="cd" x="668" y="172">Each tenant reads its own</text>
+    <text class="cd" x="668" y="192">resources first: 200, own marker,</text>
+    <text class="cd" x="668" y="210">no foreign marker, complete body</text>
+  </g>
+  <path class="ar" d="M316 164H336" marker-end="url(#a)"/>
+  <path class="ar" d="M622 164H642" marker-end="url(#a)"/>
+
+  <path class="ar" d="M700 224V248H480V264" marker-end="url(#a)"/>
+  <text class="lab" x="530" y="241">any control fails</text>
+  <path class="ar" d="M786 224V264" marker-end="url(#a)"/>
+  <text class="lab" x="796" y="250">all pass</text>
+
+  <g>
+    <rect class="skip" x="342" y="270" width="276" height="100" rx="12"/>
+    <text class="ct" x="362" y="302">Stop before crossing tenants</text>
+    <text class="cd" x="362" y="330">Cross-tenant requests are skipped</text>
+    <text class="cd" x="362" y="350">and reported as inconclusive</text>
+  </g>
+  <g>
+    <rect class="card" x="648" y="270" width="276" height="100" rx="12"/>
+    <circle cx="678" cy="302" r="14" fill="#101827"/><text class="n" x="678" y="306.5">4</text>
+    <text class="ct" x="702" y="307">Cross-tenant GET</text>
+    <text class="cd" x="668" y="336">Each tenant requests the other</text>
+    <text class="cd" x="668" y="356">tenant's resource, once</text>
+  </g>
+
+  <path class="ar" d="M786 370V424" marker-end="url(#a)"/>
+  <path class="ar" d="M174 394H786"/>
+  <path class="ar" d="M174 394V424" marker-end="url(#a)"/>
+  <path class="ar" d="M480 394V424" marker-end="url(#a)"/>
+
+  <g>
+    <rect class="card" x="36" y="430" width="276" height="112" rx="12"/>
+    <rect x="56" y="451" width="11" height="11" rx="2" fill="#d03b3b"/>
+    <text class="st" x="76" y="461">leak_observed</text>
+    <text class="cd" x="56" y="490">A foreign tenant's marker appears,</text>
+    <text class="cd" x="56" y="508">whatever the status code. Also</text>
+    <text class="cd" x="56" y="526">flagged in own-tenant controls</text>
+  </g>
+  <g>
+    <rect class="card" x="342" y="430" width="276" height="112" rx="12"/>
+    <rect x="362" y="451" width="11" height="11" rx="2" fill="#0ca30c"/>
+    <text class="st" x="382" y="461">denied</text>
+    <text class="cd" x="362" y="490">A clean 403 or 404 with a complete</text>
+    <text class="cd" x="362" y="508">body, after every control passed.</text>
+    <text class="cd" x="362" y="526">Covers this exact GET only</text>
+  </g>
+  <g>
+    <rect class="card" x="648" y="430" width="276" height="112" rx="12"/>
+    <rect x="668" y="451" width="11" height="11" rx="2" fill="#a8a79f"/>
+    <text class="st" x="688" y="461">inconclusive</text>
+    <text class="cd" x="668" y="490">401, redirect, server error,</text>
+    <text class="cd" x="668" y="508">empty 200, timeout or a</text>
+    <text class="cd" x="668" y="526">truncated body</text>
+  </g>
+
+  <rect x="36" y="562" width="888" height="40" rx="10" fill="#e9edf3"/>
+  <text class="s" x="56" y="587" style="fill:#0b0b0b">Saved: labels, status codes, marker flags, SHA-256 hashes. Never saved: tokens, bodies, marker strings, request paths.</text>
+</svg>
