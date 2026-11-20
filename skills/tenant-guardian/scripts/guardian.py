@@ -270,12 +270,14 @@ def tasks(a,out):
 def watched(path,pattern):
     # PurePosixPath.match is anchored at the end and its ** never crosses a folder. Keep its matches
     # (more invalidation stays conservative) and add a match from the root in which ** spans folders.
-    parts=PurePosixPath(path).parts;reach=[True]+[False]*len(parts)
-    for w in PurePosixPath(pattern).parts:
+    # A pattern may name a folder, which covers every file under it, so each rule also accepts a match
+    # on a folder above the path; '.' names the root. The literal comparison keeps names like [id].
+    parts=PurePosixPath(path).parts;lit=PurePosixPath(pattern).parts;reach=[True]+[False]*len(parts)
+    for w in lit:
         if w=='**':
             for i in range(1,len(parts)+1):reach[i]=reach[i] or reach[i-1]
         else:reach=[False]+[reach[i] and fnmatch.fnmatchcase(parts[i],w) for i in range(len(parts))]
-    return path==pattern or PurePosixPath(path).match(pattern) or reach[-1]
+    return parts[:len(lit)]==lit or any(reach) or any(PurePosixPath(*parts[:i]).match(pattern) for i in range(1,len(parts)+1))
 
 def recheck(a,paths):
     require_valid(a);new=copy.deepcopy(a);changed=[]

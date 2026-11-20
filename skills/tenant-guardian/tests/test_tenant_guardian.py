@@ -150,6 +150,21 @@ class AssessmentTests(unittest.TestCase):
         c=self.verified();c['watched_paths']=['backend/**'];self.assertEqual('verified_in_scope',recheck(self.a,['frontend/a.ts','backend.py'])['checks'][0]['status'])
     def test_recheck_keeps_suffix_matches(self):
         c=self.verified();c['watched_paths']=['*.sql'];self.assertEqual('insufficient_evidence',recheck(self.a,['db/schema.sql'])['checks'][0]['status'])
+    def test_recheck_folder_name_covers_files_under_it(self):
+        c=self.verified()
+        for w,p in (('backend','backend/app.py'),('backend/','backend/api/views.py'),('./backend','backend/app.py'),('backend','backend'),('app/[id]','app/[id]/page.tsx')):
+            with self.subTest(watch=w,path=p):c['watched_paths']=[w];self.assertEqual('insufficient_evidence',recheck(self.a,[p])['checks'][0]['status'])
+    def test_recheck_folder_pattern_covers_files_under_it(self):
+        c=self.verified()
+        for w,p in (('services/*','services/api/app.py'),('**/migrations','db/migrations/0001.py'),('migrations','apps/x/migrations/0001.py')):
+            with self.subTest(watch=w,path=p):c['watched_paths']=[w];self.assertEqual('insufficient_evidence',recheck(self.a,[p])['checks'][0]['status'])
+    def test_recheck_root_folder_covers_everything(self):
+        c=self.verified()
+        for w in ('.','./'):
+            with self.subTest(watch=w):c['watched_paths']=[w];self.assertEqual('insufficient_evidence',recheck(self.a,['a/b/c.py'])['checks'][0]['status'])
+    def test_recheck_folder_name_ignores_lookalike_paths(self):
+        c=self.verified();c['watched_paths']=['backend','services/*.py']
+        self.assertEqual('verified_in_scope',recheck(self.a,['backend.py','backend2/app.py','frontend/backend.ts','services/api/app.ts'])['checks'][0]['status'])
     def test_recheck_no_changes(self):self.assertEqual([],recheck(self.a,[])['recheck']['invalidated'])
     def test_recheck_traversal(self):
         with self.assertRaises(ValueError):recheck(self.a,['../secret'])

@@ -1,10 +1,10 @@
 ---
 status: active
-phase: v1.0.1 · Published
-next: v1.0.2 candidates (Needs you)
+phase: v1.0.2 · Build
+next: TG-13 · CSV tab and CR prefix
 tests: CI 104/104 on Ubuntu 3.9/3.11/3.13 (2 case-variant tests skipped there) and macOS 3.13 (0 skipped), run 44753789907 green; local macOS 104/104 on 3.13.0 and 3.9.6 (2026-11-20)
 live: https://github.com/CTO-Side-com/tenant-guardian
-updated: 2026-11-21 00:17 +0400
+updated: 2026-11-21 00:20 +0400
 ---
 # Tenant Guardian: handoff
 
@@ -139,11 +139,13 @@ updated: 2026-11-21 00:17 +0400
 
 ## Needs you
 
-- [ ] 2026-11-20 · v1.0.2: make a bare folder in `watched_paths` (`backend`, `backend/`) match the files
-      under it, so a recheck no longer fails open there? It only adds invalidations. (recommend yes)
-- [ ] 2026-11-20 · v1.0.2: prefix CSV cells that start with a bare tab or CR, as SOC 2's `csv_safe` does?
-      (recommend yes)
 - [ ] 2026-11-20 · Tag and publish a GitHub release `v1.0.1`? (recommend yes; not done unasked)
+
+- [x] 2026-11-20 · v1.0.2: make a bare folder in `watched_paths` (`backend`, `backend/`) match the files
+      under it, so a recheck no longer fails open there? It only adds invalidations. (recommend yes;
+      answered 2026-11-21 00:19: "folder name shall be adaptive", make the changes and push)
+- [x] 2026-11-20 · v1.0.2: prefix CSV cells that start with a bare tab or CR, as SOC 2's `csv_safe` does?
+      (recommend yes; answered 2026-11-21 00:19: ".csv yes", make the changes and push)
 
 - [x] 2026-11-20 · Marketplace name: rename `ctoside` to `ctoside-tenant` in both manifests and the
       README install line, as SOC 2 did with `ctoside-soc2`? (recommend rename; answered: rename)
@@ -172,6 +174,10 @@ updated: 2026-11-21 00:17 +0400
 | TG-9 | CI: macOS job, fail-fast off, v7 actions | done | 2026-11-20 18:09 | 2026-11-20 18:10 |
 | TG-10 | README, HANDOFF, manifests 1.0.1 | done | 2026-11-20 18:10 | 2026-11-20 18:11 |
 | TG-11 | Final review of v1.0.1 (security-critical) | done | 2026-11-20 18:12 | 2026-11-20 18:28 |
+| TG-12 | Recheck: a pattern naming a folder covers the files under it | done | 2026-11-21 00:20 | 2026-11-21 00:21 |
+| TG-13 | CSV: prefix cells starting with a tab or CR | active | 2026-11-21 00:21 | |
+| TG-14 | README, HANDOFF, manifests 1.0.2 | todo | | |
+| TG-15 | Final review of v1.0.2 | todo | | |
 
 ## Regenerate the README preview
 
