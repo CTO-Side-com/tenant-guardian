@@ -1,0 +1,22 @@
+{
+  "notice": "Scoped tenant-isolation assessment. Not a guarantee of isolation, penetration-test attestation or compliance certification.",
+  "raw_evidence_included": false,
+  "files": [
+    {
+      "path": "TENANT-ISOLATION.md",
+      "sha256": "f6a4d454b11c945d2f483d5c451706aa4e63018386195fdb12d916035eadb79d"
+    },
+    {
+      "path": "assessment-redacted.json",
+      "sha256": "d5af70442b88ec980323b72d3a3207a7e604fa817dc70fed3e68906f5c8cb953"
+    },
+    {
+      "path": "risk-register.csv",
+      "sha256": "09e0fde5c0ebee1e51e49ec2870faff564d083dcf2a4377fd5a2720961b1ea9e"
+    },
+    {
+      "path": "TENANT-ISOLATION.pdf",
+      "sha256": "ffb1727d6ae1917ff74f79012cb85047fc2e32f4d820826441438e5aa293fc63"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "observed_on": "2026-11-19",
+  "environment": "local",
+  "status": "review_required",
+  "plan_sha256": "a3e4012d71da5156e01e865bdba9cad665b91d1d3b2d5bc0d30fa412f8f867b6",
+  "request_count": 4,
+  "positive_controls_valid": true,
+  "cases": [
+    {
+      "resource": "synthetic_invoice_a",
+      "actor": "actor_b",
+      "result": "denied",
+      "reason": "Scoped object read was denied after valid positive controls."
+    },
+    {
+      "resource": "synthetic_invoice_b",
+      "actor": "actor_a",
+      "result": "denied",
+      "reason": "Scoped object read was denied after valid positive controls."
+    }
+  ],
+  "observations": [
+    {
+      "resource": "synthetic_invoice_a",
+      "actor": "actor_a",
+      "phase": "own_tenant_positive_control",
+      "http_status": 200,
+      "target_marker_present": true,
+      "foreign_marker_present": false,
+      "truncated": false,
+      "transport_error": false,
+      "response_sha256": "d73dba3ee69d301feff2192068b0538e3294d2c20b65f06df99d9d55a0010ee6"
+    },
+    {
+      "resource": "synthetic_invoice_b",
+      "actor": "actor_b",
+      "phase": "own_tenant_positive_control",
+      "http_status": 200,
+      "target_marker_present": true,
+      "foreign_marker_present": false,
+      "truncated": false,
+      "transport_error": false,
+      "response_sha256": "296f1eb0b6c358cb2eb3838e64c7ec3549ad0721923617f8baa93534e9d57d98"
+    },
+    {
+      "resource": "synthetic_invoice_a",
+      "actor": "actor_b",
+      "phase": "cross_tenant_negative_case",
+      "http_status": 403,
+      "target_marker_present": false,
+      "foreign_marker_present": false,
+      "truncated": false,
+      "transport_error": false,
+      "response_sha256": "68016cfdda091a181fdb218078e6cf1d06644a6b1633acf745bcb6c96a8127ec"
+    },
+    {
+      "resource": "synthetic_invoice_b",
+      "actor": "actor_a",
+      "phase": "cross_tenant_negative_case",
+      "http_status": 403,
+      "target_marker_present": false,
+      "foreign_marker_present": false,
+      "truncated": false,
+      "transport_error": false,
+      "response_sha256": "68016cfdda091a181fdb218078e6cf1d06644a6b1633acf745bcb6c96a8127ec"
+    }
+  ],
+  "notice": "Results cover only the explicitly configured GET paths and synthetic identities. Tokens, raw bodies, markers and paths are not included. No assessment status has been changed."
+}

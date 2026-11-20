@@ -1,0 +1,16 @@
+{
+  "name": "tenant-guardian",
+  "version": "1.0.0",
+  "description": "Evidence-first tenant isolation assessment, synthetic GET probes, reports and remediation tasks.",
+  "author": {
+    "name": "CTOside"
+  },
+  "license": "MIT",
+  "keywords": [
+    "tenant-isolation",
+    "saas",
+    "authorization",
+    "bola",
+    "security"
+  ]
+}

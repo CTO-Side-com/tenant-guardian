@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tenant Guardian"
+  short_description: "Assess and test SaaS tenant isolation with evidence"
+  default_prompt: "Use $tenant-guardian to assess this SaaS for cross-tenant data access and produce evidence-based findings."

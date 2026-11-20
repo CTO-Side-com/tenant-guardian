@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "origin": "http://127.0.0.1:8765",
+  "environment": "local",
+  "synthetic_only": true,
+  "actors": {
+    "actor_a": {"tenant": "synthetic_tenant_a", "token_env": "TG_TOKEN_A"},
+    "actor_b": {"tenant": "synthetic_tenant_b", "token_env": "TG_TOKEN_B"}
+  },
+  "resources": [
+    {"label": "synthetic_invoice_a", "owner": "actor_a", "path": "/synthetic/invoices/a", "marker": "TG_SYNTHETIC_ONLY_MARKER_A_43c8d2"},
+    {"label": "synthetic_invoice_b", "owner": "actor_b", "path": "/synthetic/invoices/b", "marker": "TG_SYNTHETIC_ONLY_MARKER_B_91f7a6"}
+  ]
+}

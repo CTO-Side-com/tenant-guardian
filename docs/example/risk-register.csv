@@ -1,0 +1,37 @@
+Check,Title,Status,Severity,Owner,Due,Action,Retest
+CTX-001,Verify tenant identity from authenticated membership,insufficient_evidence,,,,Collect evidence,Try a valid actor with another tenant selector and verify it cannot broaden access.
+CTX-002,Treat client tenant selectors as untrusted input,insufficient_evidence,,,,Collect evidence,Change tenant headers and path selectors while retaining the original synthetic identity.
+CTX-003,Separate tenant roles from platform administration,insufficient_evidence,,,,Collect evidence,Use a tenant administrator identity against platform-wide operations and expect denial.
+CTX-004,Isolate request and thread tenant context,insufficient_evidence,,,,Collect evidence,Alternate and concurrently execute requests for two tenants using reused workers.
+CTX-005,Revalidate tenant switching and revoked membership,insufficient_evidence,,,,Collect evidence,"Revoke synthetic membership, replay sessions and retry a tenant switch."
+API-001,Authorize tenant-owned objects on every read path,confirmed_gap,high,Synthetic fixture owner,,Enforce the fixture ownership check independently of the requested object identifier.,Both own-tenant controls succeed and both foreign fixture reads return marker-free denials. This covers GET only.
+API-002,Authorize create update and delete operations,insufficient_evidence,,,,Collect evidence,"In an isolated fixture, attempt cross-tenant update, delete and ownership reassignment; verify state is unchanged."
+API-003,Scope list search aggregation and count endpoints,insufficient_evidence,,,,Collect evidence,"Compare tenant-specific lists, search, counts, facets and pagination using distinct synthetic records."
+API-004,Validate nested and bulk resource ownership,insufficient_evidence,,,,Collect evidence,Mix synthetic A and B IDs in a batch and mismatched parent-child paths.
+API-005,Protect exports reports and download endpoints,insufficient_evidence,,,,Collect evidence,Generate an authorized synthetic export and attempt retrieval as another tenant.
+API-006,Authorize websocket subscriptions and pushed events,insufficient_evidence,,,,Collect evidence,Subscribe with A to B's synthetic topic and trigger a safe event in a fixture.
+DB-001,Choose and document an enforceable data isolation model,insufficient_evidence,,,,Collect evidence,Trace ordinary and privileged identities through the chosen isolation mechanism.
+DB-002,Review direct key lookups joins and raw SQL,insufficient_evidence,,,,Collect evidence,"Test known foreign IDs through ORM get, joins, aggregates, raw SQL and repository helpers."
+DB-003,Review PostgreSQL row security and bypass roles,insufficient_evidence,,,,Collect evidence,Inspect role and policy metadata; test SELECT and writes as the actual request role with synthetic rows.
+DB-004,Reset tenant context across pooled database connections,insufficient_evidence,,,,Collect evidence,"Alternate synthetic tenants on a reused connection, including rollback and exception paths."
+DB-005,Scope relations constraints and referential operations,insufficient_evidence,,,,Collect evidence,Attempt cross-tenant foreign-key assignments and assess errors without relying on RLS for referential checks.
+DB-006,Review migrations views and privileged database functions,insufficient_evidence,,,,Collect evidence,Exercise newly introduced and privileged query paths as ordinary tenant identities.
+CACHE-001,Namespace tenant-dependent cache entries,insufficient_evidence,,,,Collect evidence,Prime the same endpoint as B then request as A using distinguishable synthetic payloads.
+CACHE-002,Scope authorization and memoization caches,insufficient_evidence,,,,Collect evidence,Reuse object identifiers across tenant and role changes and inspect resulting decisions.
+CACHE-003,Scope cache invalidation and tenant deletion,insufficient_evidence,,,,Collect evidence,Invalidate synthetic A entries and verify B remains intact.
+CACHE-004,Review CDN and response caching variation,insufficient_evidence,,,,Collect evidence,Alternate credentials through the same cache URL and inspect synthetic response markers.
+STORE-001,Authorize object access beyond path naming,insufficient_evidence,,,,Collect evidence,Request a known foreign synthetic object through each download and storage access path.
+STORE-002,Bind signed links to approved resources and operations,insufficient_evidence,,,,Collect evidence,Try to obtain a signed link for a foreign object; assess the documented bearer-link sharing model separately.
+STORE-003,Constrain object paths and tenant-prefix boundaries,insufficient_evidence,,,,Collect evidence,Exercise synthetic path traversal variants and neighboring tenant names such as acme and acme-west.
+STORE-004,Scope object deletion versions and retained copies,insufficient_evidence,,,,Collect evidence,Use isolated synthetic versions to check only the selected tenant's allowed copies are affected.
+JOB-001,Authenticate queued tenant context,insufficient_evidence,,,,Collect evidence,Inject a foreign tenant selector in a synthetic queue message and verify independent authorization.
+JOB-002,Scope retry idempotency and dead-letter state,insufficient_evidence,,,,Collect evidence,Reuse synthetic idempotency keys across tenants and exercise retries and dead-letter access.
+JOB-003,Bind webhooks and service credentials to authorized tenants,insufficient_evidence,,,,Collect evidence,Replay a synthetic webhook with mismatched tenant identifiers and a valid but differently scoped credential.
+JOB-004,Limit tenant impact on shared worker capacity,insufficient_evidence,,,,Collect evidence,Review queue concurrency and limits; load tests require separately approved scope.
+AI-001,Enforce tenant filtering in vector and search retrieval,insufficient_evidence,,,,Collect evidence,"Index distinct synthetic markers for A and B, then retrieve as each tenant."
+AI-002,Isolate conversation history memory and semantic caches,insufficient_evidence,,,,Collect evidence,Reuse synthetic thread and document IDs across actors and inspect retrieval and memory results.
+AI-003,Enforce tool authorization outside model output,insufficient_evidence,,,,Collect evidence,Place a synthetic instruction requesting B's data in A's document and verify tool-side denial.
+AI-004,Keep traces datasets and evaluation artifacts tenant safe,insufficient_evidence,,,,Collect evidence,"Inspect approved synthetic traces, exports and evaluation data access boundaries."
+LIFE-001,Verify provisioning tenant deletion and failed setup cleanup,insufficient_evidence,,,,Collect evidence,Simulate failed provisioning and isolated synthetic tenant deletion; verify neighboring tenants remain unchanged.
+LIFE-002,Scope backup restore and support access,insufficient_evidence,,,,Collect evidence,Restore into an isolated fixture and verify only the selected tenant is copied; review support access approvals.
+LIFE-003,Protect tenant audit feeds and cross-tenant administration,insufficient_evidence,,,,Collect evidence,Read synthetic audit events as A and test platform support actions through their explicit privileged path.

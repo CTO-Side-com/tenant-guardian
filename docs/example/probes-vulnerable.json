@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "observed_on": "2026-11-19",
+  "environment": "local",
+  "status": "review_required",
+  "plan_sha256": "53b6f1fc162e954a5904a57b91ace4b2e0d877f7ad53a151aa375406f65a3faf",
+  "request_count": 4,
+  "positive_controls_valid": true,
+  "cases": [
+    {
+      "resource": "synthetic_invoice_a",
+      "actor": "actor_b",
+      "result": "leak_observed",
+      "reason": "Known foreign synthetic marker appeared in this response."
+    },
+    {
+      "resource": "synthetic_invoice_b",
+      "actor": "actor_a",
+      "result": "leak_observed",
+      "reason": "Known foreign synthetic marker appeared in this response."
+    }
+  ],
+  "observations": [
+    {
+      "resource": "synthetic_invoice_a",
+      "actor": "actor_a",
+      "phase": "own_tenant_positive_control",
+      "http_status": 200,
+      "target_marker_present": true,
+      "foreign_marker_present": false,
+      "truncated": false,
+      "transport_error": false,
+      "response_sha256": "d73dba3ee69d301feff2192068b0538e3294d2c20b65f06df99d9d55a0010ee6"
+    },
+    {
+      "resource": "synthetic_invoice_b",
+      "actor": "actor_b",
+      "phase": "own_tenant_positive_control",
+      "http_status": 200,
+      "target_marker_present": true,
+      "foreign_marker_present": false,
+      "truncated": false,
+      "transport_error": false,
+      "response_sha256": "296f1eb0b6c358cb2eb3838e64c7ec3549ad0721923617f8baa93534e9d57d98"
+    },
+    {
+      "resource": "synthetic_invoice_a",
+      "actor": "actor_b",
+      "phase": "cross_tenant_negative_case",
+      "http_status": 200,
+      "target_marker_present": true,
+      "foreign_marker_present": true,
+      "truncated": false,
+      "transport_error": false,
+      "response_sha256": "d73dba3ee69d301feff2192068b0538e3294d2c20b65f06df99d9d55a0010ee6"
+    },
+    {
+      "resource": "synthetic_invoice_b",
+      "actor": "actor_a",
+      "phase": "cross_tenant_negative_case",
+      "http_status": 200,
+      "target_marker_present": true,
+      "foreign_marker_present": true,
+      "truncated": false,
+      "transport_error": false,
+      "response_sha256": "296f1eb0b6c358cb2eb3838e64c7ec3549ad0721923617f8baa93534e9d57d98"
+    }
+  ],
+  "notice": "Results cover only the explicitly configured GET paths and synthetic identities. Tokens, raw bodies, markers and paths are not included. No assessment status has been changed."
+}
