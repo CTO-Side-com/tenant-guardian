@@ -114,7 +114,7 @@ class AssessmentTests(unittest.TestCase):
     def test_csv_cell_prefixes_leading_tab_and_cr(self):
         for s in ('\tcmd','\rcmd',' \tcmd','  \r\ncmd'):
             with self.subTest(value=s):v=cell(s);self.assertTrue(v.startswith("'"));self.assertNotIn('\r',v);self.assertNotIn('\n',v)
-        for s in ('team a','a\tb','a\rb'):
+        for s in ('team a',' team a','  note','a\tb','a\rb'):
             with self.subTest(value=s):self.assertFalse(cell(s).startswith("'"))
     def test_symlink_output_refused(self):
         with tempfile.TemporaryDirectory() as d:
